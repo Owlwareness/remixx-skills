@@ -1,0 +1,4 @@
+interface:
+  display_name: "remixx Report"
+  short_description: "Turn real work into a reviewed public Chapter"
+  default_prompt: "Use $remixx-report to capture this work session and prepare a founder-reviewed public Chapter."

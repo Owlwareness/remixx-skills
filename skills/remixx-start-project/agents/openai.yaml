@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start a remixx Project"
+  short_description: "Turn a conversation into a reviewed Project seed"
+  default_prompt: "Use $remixx-start-project to turn this conversation into a reviewed portable Project seed."

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://remixx.dev/schemas/remixx-project.v1.schema.json",
+  "title": "remixx-project.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "projectId", "slug", "name", "vaultPath"],
+  "properties": {
+    "schemaVersion": { "const": "remixx-project.v1" },
+    "projectId": { "type": "string", "format": "uuid" },
+    "slug": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 62,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+    "vaultPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))(?!.*[~$])(?!(?:\\.?[\\\\/]?)$).+$"
+    }
+  }
+}
