@@ -60,6 +60,9 @@ node bin/remixx-artifact.mjs approve-seed \
 
 ## Rules
 
+- Build only from the current workspace, this conversation, and documents the
+  founder authorizes here. Do not seek out, clone, browse, or read any other
+  repository or external source for material.
 - Do not sign in, call Remixx, create a hosted Project, or connect GitHub.
 - Do not infer approval from the request to start drafting.
 - Do not present remembered inspiration as observed repository history.
