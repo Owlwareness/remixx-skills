@@ -5,8 +5,8 @@ description: Turn real work in an accessible Project into durable private memory
 
 # Report real Project work
 
-Create private memory and one reviewed public `chapter.v1` without signing in
-or publishing.
+Create private memory and one reviewed public `chapter.v1`, then stage only the
+approved artifact for browser review without signing in or publishing.
 
 ## Workflow
 
@@ -47,12 +47,23 @@ or publishing.
       --out <public-outbox/chapter.json>
     ```
 
-11. End with the exported artifact path and the instruction to publish it in a
-    separate authenticated Remixx session.
+11. Stage the approved exported Chapter in the steward's private Remixx inbox:
+
+    ```sh
+    node bin/remixx-artifact.mjs stage-chapter \
+      --input <public-outbox/chapter.json>
+    ```
+
+12. End with the exported artifact path and returned review URL. Tell the
+    founder to refresh the authenticated Project studio, read the pending
+    Chapter, and choose Publish or Dismiss. If staging fails, preserve the file
+    and give the manual upload fallback.
 
 ## Rules
 
-- Do not sign in, call Remixx or Supabase, or publish.
+- Do not sign in, call Supabase directly, or publish.
+- Call only the bounded Chapter staging endpoint, and only after explicit
+  Chapter approval and successful public-artifact validation.
 - Keep sources, Reports, decisions, and drafts private.
 - Never auto-confirm truth, visibility, or Chapter approval.
 - Never invent movement, failure, rationale, founder observation, or belief

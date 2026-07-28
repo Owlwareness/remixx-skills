@@ -17,3 +17,7 @@ The CLI rejects common credential patterns, known private Report fields,
 unapproved Chapters, mismatched canonical hashes, and changed-content
 overwrites. These checks reduce accidental disclosure; they do not replace a
 founder's complete review of every exported artifact.
+
+Chapter staging accepts only that final approved public artifact. It never
+accepts Remixx credentials and cannot publish; an authenticated Project steward
+must review and publish the exact staged hash separately.

@@ -11,6 +11,8 @@ explicit bounded sources
   → draft chapter.v1
   → explicit Chapter approval
   → approved public chapter.v1
+  → untrusted staged handoff
+  → authenticated steward review and publication
 ```
 
 The authoritative schemas live in `schemas/`.
@@ -58,3 +60,14 @@ node bin/remixx-artifact.mjs finalize \
 
 Display the complete draft. Do not infer approval from approval of the public
 items.
+
+## Staged handoff
+
+After approval and export, send only the validated public `chapter.v1` to the
+Remixx staging endpoint. Staging is idempotent and grants no publication
+authority. The authenticated steward must still review and publish the exact
+content hash in the Project studio.
+
+If the endpoint is unavailable, keep the exported JSON as the manual fallback.
+Never stage the Report, source bundle, decisions, approved-items artifact, or a
+draft Chapter.

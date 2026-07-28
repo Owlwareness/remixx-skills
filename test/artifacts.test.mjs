@@ -10,6 +10,7 @@ import {
   validateArtifact,
   verifyProjectSeedIdentity,
 } from "../lib/artifacts.mjs";
+import { stageChapter } from "../lib/staging.mjs";
 
 const ids = {
   project: "11111111-1111-4111-8111-111111111111",
@@ -362,5 +363,97 @@ test("no-movement Reports remain private and cannot build public items", async (
       artifactId: ids.approvedItems,
     }),
     /No founder-approved publishable movement/,
+  );
+});
+
+test("stages only an approved public Chapter and returns its review URL", async () => {
+  const report = await substantiveReport();
+  const approvedItems = await buildApprovedPublicItems({
+    report,
+    decisions: decisions(report),
+    artifactId: ids.approvedItems,
+  });
+  const draft = await draftChapter(approvedItems);
+  const approved = await approveChapter(draft, {
+    approvedBy: "Founder",
+    approvedAt: later,
+  });
+  let sent;
+  const result = await stageChapter({
+    chapter: approved,
+    endpoint: "https://remixx.example/api/chapters/stage",
+    fetchImpl: async (_url, init) => {
+      sent = JSON.parse(init.body);
+      return new Response(
+        JSON.stringify({
+          stageId: "abababab-abab-4bab-8bab-abababababab",
+          projectId: approved.project.projectId,
+          chapterId: approved.chapterId,
+          contentHash: approved.contentHash,
+          status: "pending",
+          stagedAt: later,
+          duplicate: false,
+          reviewPath: `/projects/${approved.project.projectId}/chapters`,
+        }),
+        {
+          status: 202,
+          headers: { "content-type": "application/json" },
+        },
+      );
+    },
+  });
+
+  assert.deepEqual(sent, approved);
+  assert.equal(
+    result.reviewUrl,
+    `https://remixx.example/projects/${approved.project.projectId}/chapters`,
+  );
+});
+
+test("never stages a draft Chapter or trusts a mismatched response", async () => {
+  const report = await substantiveReport();
+  const approvedItems = await buildApprovedPublicItems({
+    report,
+    decisions: decisions(report),
+    artifactId: ids.approvedItems,
+  });
+  const draft = await draftChapter(approvedItems);
+  let called = false;
+  await assert.rejects(
+    stageChapter({
+      chapter: draft,
+      endpoint: "https://remixx.example/api/chapters/stage",
+      fetchImpl: async () => {
+        called = true;
+      },
+    }),
+    /explicitly approved/,
+  );
+  assert.equal(called, false);
+
+  const approved = await approveChapter(draft, {
+    approvedBy: "Founder",
+    approvedAt: later,
+  });
+  await assert.rejects(
+    stageChapter({
+      chapter: approved,
+      endpoint: "https://remixx.example/api/chapters/stage",
+      fetchImpl: async () =>
+        new Response(
+          JSON.stringify({
+            stageId: "abababab-abab-4bab-8bab-abababababab",
+            projectId: approved.project.projectId,
+            chapterId: "cdcdcdcd-cdcd-4dcd-8dcd-cdcdcdcdcdcd",
+            contentHash: approved.contentHash,
+            status: "pending",
+            stagedAt: later,
+            duplicate: false,
+            reviewPath: `/projects/${approved.project.projectId}/chapters`,
+          }),
+          { status: 202 },
+        ),
+    }),
+    /does not match/,
   );
 });

@@ -19,5 +19,6 @@ Before export, scan recursively for forbidden Report fields and credential-like
 values. Refuse changed-content overwrite. A successful schema check never
 substitutes for founder review.
 
-The platform session may receive the exported Chapter file only. It must not
-open the private Project Brain to make publishing convenient.
+The staging endpoint and platform session may receive the exported Chapter
+only. Staging does not publish and must not open the private Project Brain to
+make the handoff convenient.

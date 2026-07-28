@@ -20,23 +20,26 @@ and `/report`.
 ## Trust boundary
 
 The skills never sign in to Remixx, publish to Remixx, or receive Remixx
-credentials. They produce reviewed portable artifacts:
+credentials. They produce reviewed portable artifacts and may stage only the
+final approved public Chapter in a steward-only inbox:
 
 ```text
 conversation → approved project-seed.v1
-real work → private report.v1 → approved public chapter.v1
+real work → private report.v1 → approved public chapter.v1 → pending inbox
 ```
 
 Authentication begins in the separate hosted platform session that claims a
-Project seed or publishes a matching Chapter. Private Reports, raw sources,
-visibility decisions, and draft Chapters do not cross that boundary.
+Project seed or reviews and publishes a pending Chapter. Staging grants no
+publication authority. Private Reports, raw sources, visibility decisions, and
+draft Chapters do not cross that boundary.
 
 ## Artifact CLI
 
 The included CLI supplies deterministic schema validation, canonical hashes,
 public-subset construction, approval transitions, and leak-resistant Chapter
-export. It does not call a model: the active AI host performs the reasoning,
-while the CLI protects the artifact boundaries.
+export, plus a bounded approved-Chapter staging handoff. It does not call a
+model: the active AI host performs the reasoning, while the CLI protects the
+artifact boundaries.
 
 ```sh
 npm install

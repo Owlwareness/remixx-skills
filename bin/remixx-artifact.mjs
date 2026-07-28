@@ -13,6 +13,7 @@ import {
   writeJsonIdempotently,
 } from "../lib/artifacts.mjs";
 import { artifactKinds } from "../lib/schemas.mjs";
+import { stageChapter } from "../lib/staging.mjs";
 
 function parseArguments(values) {
   const [command, ...rest] = values;
@@ -57,6 +58,8 @@ Commands:
     --approved-at <ISO-8601> --out <json>
 
   export-chapter --input <approved-json> --out <public-json>
+
+  stage-chapter --input <approved-json> [--endpoint <https-url>]
 `;
 
 async function main() {
@@ -156,6 +159,15 @@ async function main() {
     process.stdout.write(
       `${await writeJsonIdempotently(required(options, "out"), value)}\n`,
     );
+    return;
+  }
+
+  if (command === "stage-chapter") {
+    const result = await stageChapter({
+      chapter: await readJson(required(options, "input")),
+      endpoint: options.endpoint,
+    });
+    process.stdout.write(`${JSON.stringify(result)}\n`);
     return;
   }
 
