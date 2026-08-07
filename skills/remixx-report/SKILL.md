@@ -64,12 +64,11 @@ Then carry on. The rest of the flow is the same either way.
 9. **Capture the evidence and make the video.** Drive the real product into each state on the shot list and
    record it. Use `scripts/capture_browser_demo.mjs` — never hand-drive a browser with inline scripts.
    Validate the plan with `scripts/validate_video_plan.mjs`.
-10. **Watch it back yourself, then show the contact sheet and pause.** Before showing the founder anything,
-    answer one question honestly: with the sound off, could someone who has never seen this tell what it
-    does? If no, the shot list was wrong — re-record rather than writing a better caption over a dead
-    screen. The capture script's content assertions cannot answer this; they pass on browser chrome and a
-    moving cursor over an empty page. Then render, show the finished video with audio, and pause again for
-    exact-preview approval bound to all four hashes.
+10. **Look at what you made, then show the founder the finished thing.** A quick look is enough — is the
+    product visibly doing something, is anything obviously broken. You do not have to certify the video, and
+    you should not spend the session on frame-by-frame self-review; the capture script already refuses a
+    blank or frozen recording, and taste is the founder's call. Render, show the finished video with audio,
+    and get the exact-preview approval bound to all four hashes.
 11. **Approve and export**, only after explicit approval:
 
     ```sh
@@ -132,8 +131,17 @@ Then carry on. The rest of the flow is the same either way.
     that spends the post's only hash on a version with no video in it. The run then ends with an exact
     statement of what blocked the review URL, which is the other half of the rule above.
 
-13. **Hand over the review URL as the last line of your response.** The founder refreshes their studio,
-    sees the post as it will actually appear, and chooses Publish or Dismiss.
+13. **Hand over the review URL as the last line of your response, and offer to change it.** The founder
+    refreshes their studio, sees the post as it will actually appear, and chooses Publish or Dismiss. Say
+    plainly that if they do not like it — the video, the script, the framing, any of it — they can just tell
+    you what to change and you will make it again. They should not have to approve each step to get there;
+    they should see the result and say yes or no.
+
+    One mechanic to be straight about if they do ask for a different video: staging is keyed on the post's
+    exact content hash, so if the post text is unchanged the platform returns the existing staged record
+    rather than accepting new media. A re-render therefore lands as a new post rather than swapping the
+    video on the old one, and the old one should be dismissed. Say so rather than silently staging
+    something that did not take.
 
 ## Rules
 
@@ -154,8 +162,10 @@ Then carry on. The rest of the flow is the same either way.
   its start state while narration talks over it is the most common way a video says nothing. Do not reload
   the page between shots unless the reload is the point; whatever the product has built up is gone
   afterwards. This has already produced a finished video whose canvas was blank.
-- **Watch every second of every recording before approving it.** Publication is immutable. Ask whether
-  someone with the sound off could tell what the product does; no automated check can answer that.
+- **Show the finished video and offer to change it.** You do not need to certify it frame by frame — the
+  capture script already refuses a blank or frozen recording, and whether it is any good is the founder's
+  call. Publication is immutable, which is exactly why the founder is the gate and the post is staged rather
+  than published. If they want it different, take the note and make it again.
 - **Never stage a post text-only when a screencast or a rendered recap exists.** Staging is content-hash
   keyed, so that post can never gain its media afterwards. Stop, hand over the artifact paths, and say what
   is missing.

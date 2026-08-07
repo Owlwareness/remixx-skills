@@ -470,13 +470,21 @@ if (plan.approval?.status === "approved") {
   );
 }
 if (requireApproved) {
+  // Privacy approval is required and stays required: it is what confirms the
+  // founder agreed to what becomes public, and that is not a matter of taste.
   requireValue(
     plan.privacy?.founderApprovalState === "approved",
     "founder privacy approval is required for rendering",
   );
+  // Contact-sheet approval is deliberately NOT required. It used to be, which
+  // meant the founder had to sign off a storyboard before anything could render
+  // -- an approval on an intermediate artifact that exists only for review.
+  // The taste decision belongs on the finished video, where it is one yes or no
+  // bound to the real hashes. If a contact sheet is shown and approved anyway,
+  // the block above still validates its fields.
   requireValue(
-    plan.approval?.status === "approved",
-    "founder contact-sheet approval is required for rendering",
+    plan.approval?.status !== "rejected",
+    "the contact sheet was rejected; do not render it",
   );
 }
 

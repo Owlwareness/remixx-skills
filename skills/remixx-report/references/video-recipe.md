@@ -48,17 +48,18 @@ Two things that are easy to get wrong and expensive to discover afterwards:
 If the product ends up in a state worth seeing whole, show it once near the end. That frame is often the
 most convincing one in the video.
 
-Then, having recorded it, answer one question honestly before you go anywhere near approval:
+Then hand it over and let the founder judge it. The question that decides whether a post is any good is:
 
 > With the sound off, could someone who has never seen this tell what it does?
 
-If the answer is no, the shot list was wrong and the fix is to re-record, not to write a better caption
-over a dead screen. **No automated check can answer that question for you.** The content assertions in the
-capture script prove a recording is not blank and not frozen, and they pass happily on browser chrome and a
-moving cursor over an empty page — a blank-canvas recording scored a `peakStdDev` of 95.9 against a
-threshold of 3. Structural gates prove form. Only watching it proves the point.
+That is a taste question, so it is theirs, not yours — and no automated check answers it anyway. The content
+assertions in the capture script prove a recording is not blank and not frozen, and they pass happily on
+browser chrome and a moving cursor over an empty page; a blank-canvas recording scored a `peakStdDev` of 95.9
+against a threshold of 3. So do not try to certify the video frame by frame. Show it, say what it shows, and
+say that if they want it different they can just tell you what to change and you will make it again.
 
-If you re-record after showing the founder a contact sheet, say so and get approval again. A previous run
+Planning the shot list well is how you avoid needing a second attempt. If one is asked for, re-record rather
+than writing a better caption over a dead screen — and say so and get approval again, because a previous run
 approved a 5.4s clip and staged a 12.48s re-record under the same approval.
 
 ## Required production artifacts
@@ -77,8 +78,8 @@ Create one private `report-video-plan.v1` JSON containing:
   optional text, and easing.
 - `privacy`: `structuralRedactions[]`, deliberately `retainedPublicProof[]` with reasons, and
   `founderApprovalState` (`pending`, `approved`, or `rejected`).
-- `approval`: contact-sheet `status` (`pending`, `approved`, or `rejected`), plus nullable `approvedBy` and
-  `approvedAt` until approved.
+- `approval`: `status` (`pending`, `approved`, or `rejected`) for an optional contact sheet, plus nullable
+  `approvedBy` and `approvedAt` until approved.
 
 Use only claim refs present in `approvedClaimRefs`. Keep beats non-overlapping; keep each narration segment
 inside its named beat. Resolve relative asset paths from the plan file. Use
@@ -86,10 +87,11 @@ inside its named beat. Resolve relative asset paths from the plan file. Use
 shaped as `{ assetId, selector }` or `{ assetId, rect: { x, y, width, height } }`. Use retained-proof
 entries shaped as `{ assetId, reason }`.
 
-Run `node <skill-directory>/scripts/validate_video_plan.mjs <plan.json>` before review. After recording
-contact-sheet approval and changing the privacy state to `approved`, run it again with
-`--require-approved`; the command verifies both approvals and referenced file hashes, then prints the exact
-plan-file hash for the renderer handoff.
+Run `node <skill-directory>/scripts/validate_video_plan.mjs <plan.json>` before review. Once the privacy
+state is `approved`, run it again with `--require-approved`; the command verifies the privacy approval and
+the referenced file hashes, then prints the exact plan-file hash for the renderer handoff. It does **not**
+require a contact-sheet approval — see "The approval gate" — but it will refuse to pass a plan whose contact
+sheet was explicitly rejected.
 
 Supported proof kinds: `before_state`, `ui_state`, `interaction`, `external_console`, `negative_evidence`.
 
@@ -230,17 +232,30 @@ fallback voice, say so — that is a configuration problem to report, not someth
 
 ## The approval gate
 
-Show every visual beat as:
+**One decision, on the finished thing.** After rendering, show the complete video with audio and its
+disclosures, hash its exact bytes, and get an approval bound to the chapter hash, media-manifest hash,
+public-presentation hash and output hash. That is the gate, and it is the only taste approval there is.
 
-`thumbnail with final cues | spoken text | caption text | proof claim | redactions`
+There used to be a second one earlier: a contact sheet of every beat that had to be signed off before
+anything could render. It is now optional. Making a founder approve a storyboard before they have seen a
+video is an approval on an artifact that exists only for review, and the honest version of the gate is
+seeing the real thing and saying yes or no. Show a contact sheet if it genuinely helps a decision — a
+disputed redaction, an unclear claim — not as a checkpoint. If you do show one and it is rejected, do not
+render it.
 
-Do not render the public video until that contact sheet is approved. Founder presentation edits retain
-claim references and use founder-edited provenance. After rendering, show the complete output with audio
-and disclosures, hash its exact bytes, and get a second approval bound to the chapter hash, media-manifest
-hash, public-presentation hash and output hash. Do not stage from contact-sheet approval alone.
+Two things are still required and are not matters of taste:
 
-**If any asset changes after the contact sheet is approved, say so and get approval again.** A previous run
-approved a 5.4s clip and staged a 12.48s re-record under the same approval.
+- **Privacy approval** (`privacy.founderApprovalState`) before rendering. This is what confirms the founder
+  agreed to what becomes public, and it is the truth boundary rather than an opinion about the video.
+- **Say when an asset changes after you showed it.** A previous run showed a 5.4s clip and staged a 12.48s
+  re-record under the same approval. If what you staged is not what they saw, that is a provenance problem,
+  not a formality.
+
+Founder presentation edits retain claim references and use founder-edited provenance.
+
+And when you hand the video over, say that if they want it different they can just tell you what to change
+and you will make it again. They should not have to steer each step to get a result they like; they should
+see the result and say yes or no.
 
 ## Staging
 
