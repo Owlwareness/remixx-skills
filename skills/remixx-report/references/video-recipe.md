@@ -21,6 +21,46 @@ Two habits, not templates:
 `beats[]` entries take an optional free-form `storyBeat` label. Use it to organise your own plan. Nothing
 validates a particular set of labels or their order.
 
+## Plan the shot list before you open a browser
+
+This is the step most worth spending real thought on, and skipping it is how a technically perfect video
+ends up not worth watching. **Write the shot list down before recording anything**, and show it to the
+founder along with the script. It is cheap to change a list and expensive to re-record.
+
+A shot list is just: the states the product goes through, in the order the video shows them, and what makes
+each one visible. Three to five is usually plenty.
+
+The single question to hold each shot against: **what visibly changes here?** Name it — a list filling, a
+number moving, a page arriving, a stroke appearing, a player starting. If you cannot say what changes, that
+shot is not evidence of anything, and the product sitting in its start state while narration talks over it
+is the most common way a video says nothing. Then drive the product the way a person would to make that
+change happen, and use the step kind that genuinely performs it.
+
+Two things that are easy to get wrong and expensive to discover afterwards:
+
+- **Let the result sit on screen after the action.** A click that is cut away from immediately proves
+  nothing, and the eye needs a moment to see what changed. `hold` steps are for this.
+- **Do not reload the page between shots unless the reload _is_ the point.** Whatever the product has built
+  up — a drawing, a cart, a filtered list, a session, a log — is gone after a reload, and a plan organised
+  as one page load per talking point throws away the proof it just created. Plan a single run through the
+  product and let it accumulate. This has already produced a finished video whose canvas was blank.
+
+If the product ends up in a state worth seeing whole, show it once near the end. That frame is often the
+most convincing one in the video.
+
+Then, having recorded it, answer one question honestly before you go anywhere near approval:
+
+> With the sound off, could someone who has never seen this tell what it does?
+
+If the answer is no, the shot list was wrong and the fix is to re-record, not to write a better caption
+over a dead screen. **No automated check can answer that question for you.** The content assertions in the
+capture script prove a recording is not blank and not frozen, and they pass happily on browser chrome and a
+moving cursor over an empty page — a blank-canvas recording scored a `peakStdDev` of 95.9 against a
+threshold of 3. Structural gates prove form. Only watching it proves the point.
+
+If you re-record after showing the founder a contact sheet, say so and get approval again. A previous run
+approved a 5.4s clip and staged a 12.48s re-record under the same approval.
+
 ## Required production artifacts
 
 Create one private `report-video-plan.v1` JSON containing:
@@ -70,7 +110,14 @@ cannot prove a click worked, or that something stayed unchanged while everything
    connection.
 8. Keep captions secondary to the evidence.
 
-Frame **portrait** where you can. The post's media well is 4:5 and crops the sides off a landscape capture.
+**Frame the app at its natural aspect — do not force portrait.** The post's media well takes its shape
+from the leading asset and contains it rather than cropping it, and the recap renders at the aspect of the
+evidence it shows. So capture the product at whatever viewport it is actually used at: a desktop tool
+recorded at 1440x900 stays landscape all the way to the feed. Forcing a landscape app into a portrait
+viewport used to shrink the one thing worth watching into a box in the middle of the frame.
+
+Two bounds worth knowing: the well clamps to between 1:2 and 1.91:1, and the recap frame is capped at
+2160px per edge and about 2.07 megapixels. Pick a capture viewport inside those and nothing gets reshaped.
 
 ## Capturing
 
@@ -92,7 +139,22 @@ Prepare a private config with `url`, `profilePath`, a `.webm` `outputPath`, `exe
 `selector` and generic `replacement`. URLs must use HTTP or HTTPS and must not contain credentials.
 
 Steps: `{ kind: "waitFor", selector }`, `{ kind: "moveCursor", selector, durationMs? }`,
-`{ kind: "click", selector, moveMs?, afterMs? }`, `{ kind: "hold", durationMs? }`.
+`{ kind: "click", selector, moveMs?, afterMs? }`, `{ kind: "hold", durationMs? }`, and
+`{ kind: "drag", selector, path, segmentMs?, moveMs?, afterMs?, interpolationSteps? }`.
+
+Drive the product the way someone using it would. For most things that is `click` and then `hold` while the
+result appears — a button, a form, a navigation, a toggle. Reach for `drag` when the interaction genuinely
+needs a held pointer, which `click` cannot express: a canvas stroke, a slider, a map pan, a drag-and-drop.
+
+One trap worth knowing, because it is not obvious: **`moveCursor` moves only the decorative overlay cursor,
+not the real pointer.** It is for drawing attention, not for interacting. Used as if it were an interaction
+it will show a cursor gliding across a surface that receives nothing.
+
+For `drag`, `path` is 2 to 64 points given as `{ xRatio, yRatio }` fractions of the target element's box, so
+a path survives a crop and means the same thing at any viewport. `segmentMs` (default 220) is the dwell
+between points and `interpolationSteps` (default 24) is how finely each segment is interpolated. The emitted
+cue records the selector, the element rectangle and the resolved absolute points, so a rendered cursor can
+follow the same coordinates the pointer actually took.
 
 ```sh
 node <skill-directory>/scripts/capture_browser_demo.mjs --config <config.json>
@@ -182,6 +244,10 @@ approved a 5.4s clip and staged a 12.48s re-record under the same approval.
 
 ## Staging
 
+**Staging text-only when a screencast or a rendered recap exists is FORBIDDEN, not a fallback.** Staging is
+keyed by content hash: a post staged without media can never afterwards gain media under the same hash — the
+retry answers `duplicate: true` — so the "rescue" permanently ruins the post it was trying to rescue.
+
 Use the bounded `chapter-media-stage.v1` flow, only after exact-preview approval:
 
 1. POST the approved chapter, approved media manifest, renderer-produced `chapter-recap-video.v1` public
@@ -192,9 +258,32 @@ Use the bounded `chapter-media-stage.v1` flow, only after exact-preview approval
 4. Return the authenticated review URL. **Never call Publish**, and never upload private plans, raw or
    unapproved captures, contact sheets, or unapproved alternates.
 
+Do not improvise that flow per run. The reproducible command is
+`apps/web/scripts/stage-chapter-media.mts` in the Remixx monorepo, run as
+`pnpm --filter @remixx/web stage:media -- --chapter … --presentation … --assets …`. It computes `mime`,
+`width`, `height`, `durationMs` and every hash through the **same** decoder the ingress re-checks uploads
+with, refuses before touching the network when anything disagrees, treats an exact retry as the success it
+is, writes a receipt beside the artifacts, and prints the review URL as its last line.
+
+**Honest limitation:** that command lives in the monorepo precisely because it must share the server's
+decoder, and this skill repo has no renderer yet. A fresh clone can capture evidence but cannot render a
+recap or attach media.
+
+**If media cannot be staged, STOP without staging.** Two cases matter in practice: no renderer is available
+in this environment, or the project is not registered on the platform, so the bindings will be rejected.
+Either way, hand over the artifact paths, say plainly what is missing and what would unblock it, and stage
+nothing. A crippled post is worse than no post, because the hash is spent.
+
+That is not permission to end quietly. **The run never ends without either a review URL or an exact
+statement of what blocked one** — name the missing piece, not a vague apology.
+
 Measured limits, worth planning the shot list around: at most 8 assets, exactly one recap video,
 `app_screencast` must be `video/webm`, the recap must be `video/mp4`, every video at most 20 seconds and
 32MB, at most 64MB per stage, and `capturedFrom` must be loopback.
+
+Never take `width`, `height`, `durationMs` or `mime` from the render plan or from ffmpeg's rounding. The
+endpoint re-decodes every uploaded byte and compares exactly; a real render off by 4ms is enough to be
+rejected. Derive them from the decode.
 
 The private `report-video-plan.v1` is an editorial and approval artifact, not the public presentation
 contract. Require the renderer to preserve it and emit the validated, hash-bound public presentation

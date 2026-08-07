@@ -54,12 +54,23 @@ Then carry on. The rest of the flow is the same either way.
 
 7. **Compile the public draft** in a fresh context containing only the approved items. If the host cannot
    isolate that context, stop and hand over the approved-items path.
-8. **Capture the evidence and make the video.** Drive the real product into each state you named and record
-   it. Use `scripts/capture_browser_demo.mjs` — never hand-drive a browser with inline scripts. Validate
-   the plan with `scripts/validate_video_plan.mjs`.
-9. **Show the contact sheet and pause.** Then render, show the finished video with audio, and pause again
-   for exact-preview approval bound to all four hashes.
-10. **Approve and export**, only after explicit approval:
+8. **Plan the shot list, and show it to the founder with the script.** Before opening a browser, write down
+   the states the product goes through, in order, and for each one name **what visibly changes**. Three to
+   five is plenty. Then drive the product the way a person would to make that change happen, and let each
+   result sit on screen for a moment. Do not reload the page between shots unless the reload is the point —
+   whatever the product has built up is gone afterwards. This is the step that decides whether the video is
+   worth watching, and it is cheap to change a list and expensive to re-record. Read
+   [video-recipe.md](references/video-recipe.md) → "Plan the shot list before you open a browser".
+9. **Capture the evidence and make the video.** Drive the real product into each state on the shot list and
+   record it. Use `scripts/capture_browser_demo.mjs` — never hand-drive a browser with inline scripts.
+   Validate the plan with `scripts/validate_video_plan.mjs`.
+10. **Watch it back yourself, then show the contact sheet and pause.** Before showing the founder anything,
+    answer one question honestly: with the sound off, could someone who has never seen this tell what it
+    does? If no, the shot list was wrong — re-record rather than writing a better caption over a dead
+    screen. The capture script's content assertions cannot answer this; they pass on browser chrome and a
+    moving cursor over an empty page. Then render, show the finished video with audio, and pause again for
+    exact-preview approval bound to all four hashes.
+11. **Approve and export**, only after explicit approval:
 
     ```sh
     node bin/remixx-artifact.mjs approve-chapter \
@@ -73,9 +84,34 @@ Then carry on. The rest of the flow is the same either way.
       --out <public-outbox/chapter.json>
     ```
 
-11. **Stage it** into the founder's private inbox, and **always end with a review URL**. This step is not
+12. **Stage it** into the founder's private inbox, and **always end with a review URL**. This step is not
     optional and must not be skipped — a run that produces artifacts on disk and no link has failed, from
     the founder's point of view.
+
+    **Staging a post text-only when a screencast or a rendered recap exists is FORBIDDEN.** Staging is
+    keyed by content hash, so a post staged without media can never afterwards gain media under the same
+    hash — the retry answers `duplicate: true` and that post is spent for good. Text-only staging is
+    correct only for a session that produced no visual evidence at all.
+
+    With a rendered recap in hand, stage the post and its media together in one bounded command. It takes
+    the approved post, the public presentation manifest and the asset descriptor list, verifies every byte
+    locally against the same decoder the server re-checks with, runs the three-phase
+    `chapter-media-stage.v1` flow, writes a receipt beside the artifacts, and prints the review URL as its
+    last line:
+
+    ```sh
+    pnpm --filter @remixx/web stage:media -- \
+      --chapter <approved-chapter.json> \
+      --presentation <recap.manifest.json> \
+      --assets <recap-assets.json>
+    ```
+
+    It refuses before touching the network if the post is not approved, if the post and the presentation
+    disagree on ID or hash, if any file's bytes do not hash to the sha256 it declares, if the shared
+    decoder cannot read a file, or if there is not exactly one `recap_video`. Every refusal names what
+    blocked it.
+
+    For a session with no visual evidence at all, the text-only path is still this:
 
     ```sh
     node bin/remixx-artifact.mjs stage-chapter \
@@ -84,16 +120,19 @@ Then carry on. The rest of the flow is the same either way.
 
     That command needs no configuration and prints a `reviewUrl`.
 
-    **On video:** staging media requires a rendered recap — the endpoint demands exactly one
-    `recap_video` MP4, a public presentation manifest, and a four-hash exact-preview approval. **This repo
-    does not yet contain a renderer or a narration step**, so if all you have is a raw screencast, you
-    cannot stage media yet. Do not stop and leave the founder with nothing. Stage the post, hand over the
-    URL, and say plainly that the video is captured but not yet rendered or attached.
+    **Honest limitation, stated rather than papered over:** the reproducible media staging command lives
+    in the Remixx monorepo today, at `apps/web/scripts/stage-chapter-media.mts`, because it has to share
+    the ingress decoder to compute `mime`, `width`, `height` and `durationMs` exactly the way the server
+    re-checks them. **This skill repo has no renderer and no narration step**, so a fresh clone can
+    capture evidence but cannot yet render a recap or attach media.
 
-    Be aware this has a cost worth stating out loud: staging is keyed by content hash, so a post staged
-    without media cannot later gain media under the same hash. Say so when you hand over the link.
+    **So if media cannot be staged — no renderer available in this environment, or the project is not
+    registered on the platform — STOP without staging.** Hand over the artifact paths, say plainly what is
+    missing and what would unblock it. Do not stage a crippled post just to have something to link to;
+    that spends the post's only hash on a version with no video in it. The run then ends with an exact
+    statement of what blocked the review URL, which is the other half of the rule above.
 
-12. **Hand over the review URL as the last line of your response.** The founder refreshes their studio,
+13. **Hand over the review URL as the last line of your response.** The founder refreshes their studio,
     sees the post as it will actually appear, and chooses Publish or Dismiss.
 
 ## Rules
@@ -111,7 +150,15 @@ Then carry on. The rest of the flow is the same either way.
   little, say so — `no_movement` is a successful private-memory result with no post.
 - Never manufacture a caveat to look balanced, and never hide a real one to look better.
 - Do not put a number in the title. Say what happened.
-- **Watch every second of every recording before approving it.** Publication is immutable.
+- **Plan the shot list before recording, and name what visibly changes in each shot.** A product sitting in
+  its start state while narration talks over it is the most common way a video says nothing. Do not reload
+  the page between shots unless the reload is the point; whatever the product has built up is gone
+  afterwards. This has already produced a finished video whose canvas was blank.
+- **Watch every second of every recording before approving it.** Publication is immutable. Ask whether
+  someone with the sound off could tell what the product does; no automated check can answer that.
+- **Never stage a post text-only when a screencast or a rendered recap exists.** Staging is content-hash
+  keyed, so that post can never gain its media afterwards. Stop, hand over the artifact paths, and say what
+  is missing.
 - Do not finish without a review URL, or without saying exactly what blocked one.
 
 ## Vocabulary

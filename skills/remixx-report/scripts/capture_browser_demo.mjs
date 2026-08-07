@@ -51,7 +51,14 @@ const executablePath = config.executablePath ?? process.env.CHROMIUM_PATH;
 const url = requiredConfigString("url");
 const parsedUrl = new URL(url);
 const redactions = config.redactions ?? [];
-const supportedSteps = new Set(["hold", "waitFor", "moveCursor", "click"]);
+const supportedSteps = new Set([
+  "hold",
+  "waitFor",
+  "moveCursor",
+  "click",
+  "drag",
+]);
+const MAX_DRAG_POINTS = 64;
 
 // Content assertions. Structural validation cannot tell a stream playing from a page that never
 // loaded -- a recording of an empty div satisfies every byte/dimension/duration bound downstream.
@@ -155,12 +162,50 @@ for (const [index, step] of config.steps.entries()) {
     throw new Error(`Unsupported step ${index + 1}: ${String(step?.kind)}`);
   }
   if (
-    ["waitFor", "moveCursor", "click"].includes(step.kind) &&
+    ["waitFor", "moveCursor", "click", "drag"].includes(step.kind) &&
     (typeof step.selector !== "string" || step.selector.trim().length === 0)
   ) {
     throw new Error(`step ${index + 1} requires a selector`);
   }
-  const timingKeys = ["durationMs", "moveMs", "afterMs"];
+  // A drag is the only way to demonstrate anything that responds to a held
+  // pointer -- a canvas stroke, a slider, a map pan, a drag-and-drop. Points are
+  // ratios of the target element's box so the path survives a crop and stays
+  // meaningful at any viewport.
+  if (step.kind === "drag") {
+    if (
+      !Array.isArray(step.path) ||
+      step.path.length < 2 ||
+      step.path.length > MAX_DRAG_POINTS
+    ) {
+      throw new Error(
+        `step ${index + 1} requires a path of 2 to ${MAX_DRAG_POINTS} points`,
+      );
+    }
+    for (const [pointIndex, point] of step.path.entries()) {
+      for (const key of ["xRatio", "yRatio"]) {
+        if (
+          !Number.isFinite(point?.[key]) ||
+          point[key] < 0 ||
+          point[key] > 1
+        ) {
+          throw new Error(
+            `step ${index + 1} path point ${pointIndex + 1} needs ${key} from 0 to 1`,
+          );
+        }
+      }
+    }
+    if (
+      step.interpolationSteps !== undefined &&
+      (!Number.isInteger(step.interpolationSteps) ||
+        step.interpolationSteps < 1 ||
+        step.interpolationSteps > 200)
+    ) {
+      throw new Error(
+        `step ${index + 1} interpolationSteps must be an integer from 1 to 200`,
+      );
+    }
+  }
+  const timingKeys = ["durationMs", "moveMs", "afterMs", "segmentMs"];
   for (const key of timingKeys) {
     if (
       step[key] !== undefined &&
@@ -629,6 +674,52 @@ for (const [index, step] of config.steps.entries()) {
       durationMs: 320,
     });
     await locator.click();
+    await page.waitForTimeout(step.afterMs ?? 1000);
+    continue;
+  }
+  if (step.kind === "drag") {
+    // The real pointer, held down, along the path. `moveCursor` only animates the
+    // decorative overlay, so it can show a cursor travelling over a canvas while
+    // the canvas receives nothing -- which is exactly how a drawing app ended up
+    // blank in a finished video that passed every structural gate.
+    const { rect } = await locate(step.selector);
+    const points = step.path.map((point) => ({
+      x: rect.x + rect.width * point.xRatio,
+      y: rect.y + rect.height * point.yRatio,
+    }));
+    const first = points[0];
+    const segmentMs = step.segmentMs ?? 220;
+    const interpolationSteps = step.interpolationSteps ?? 24;
+    const placeOverlay = async (x, y, ms) => {
+      await page.evaluate(
+        ({ x, y, ms }) => {
+          const cursor = document.getElementById("remixx-report-cursor");
+          cursor.style.transitionDuration = `${ms}ms`;
+          cursor.style.opacity = "1";
+          cursor.style.transform = `translate(${x - 14}px,${y - 14}px)`;
+        },
+        { x, y, ms },
+      );
+    };
+
+    await page.mouse.move(first.x, first.y);
+    await placeOverlay(first.x, first.y, step.moveMs ?? 650);
+    await page.waitForTimeout(step.moveMs ?? 650);
+    await page.mouse.down();
+    for (const point of points.slice(1)) {
+      await page.mouse.move(point.x, point.y, { steps: interpolationSteps });
+      await placeOverlay(point.x, point.y, segmentMs);
+      await page.waitForTimeout(segmentMs);
+    }
+    await page.mouse.up();
+    cues.push({
+      atMs: Date.now() - startedAt,
+      kind: "drag",
+      selector: step.selector,
+      rect,
+      points,
+      durationMs: segmentMs * (points.length - 1),
+    });
     await page.waitForTimeout(step.afterMs ?? 1000);
     continue;
   }
