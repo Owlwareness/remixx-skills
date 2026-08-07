@@ -66,23 +66,37 @@ Then carry on. The rest of the flow is the same either way.
       --out <public-outbox/chapter.json>
     ```
 
-11. **Stage it** into the founder's private inbox. For a text-only post:
+11. **Stage it** into the founder's private inbox, and **always end with a review URL**. This step is not
+    optional and must not be skipped — a run that produces artifacts on disk and no link has failed, from
+    the founder's point of view.
 
     ```sh
     node bin/remixx-artifact.mjs stage-chapter \
       --input <public-outbox/chapter.json>
     ```
 
-    For a post with video, use the bounded media staging flow in
-    [video-recipe.md](references/video-recipe.md). Stage the media in the **same** pending stage as the
-    post — do not stage the text first and attach media afterwards.
+    That command needs no configuration and prints a `reviewUrl`.
 
-12. **Hand over the review URL.** The founder refreshes their studio, sees the post as it will actually
-    appear, and chooses Publish or Dismiss.
+    **On video:** staging media requires a rendered recap — the endpoint demands exactly one
+    `recap_video` MP4, a public presentation manifest, and a four-hash exact-preview approval. **This repo
+    does not yet contain a renderer or a narration step**, so if all you have is a raw screencast, you
+    cannot stage media yet. Do not stop and leave the founder with nothing. Stage the post, hand over the
+    URL, and say plainly that the video is captured but not yet rendered or attached.
+
+    Be aware this has a cost worth stating out loud: staging is keyed by content hash, so a post staged
+    without media cannot later gain media under the same hash. Say so when you hand over the link.
+
+12. **Hand over the review URL as the last line of your response.** The founder refreshes their studio,
+    sees the post as it will actually appear, and chooses Publish or Dismiss.
 
 ## Rules
 
 - Do not sign in, call the database directly, or publish. Publication is the founder's, always.
+- **Never write the founder's name into an approval field for an approval they did not give.** The
+  approval fields on the artifact are a provenance claim, not a formality. If the founder has not said yes
+  in this session, you may not pass their name to `--approved-by`. Ask, or stop and hand over the
+  unapproved draft path. Recording an approval that did not happen is the most expensive kind of bug this
+  product can ship, and it is worse than the friction of asking.
 - Never auto-confirm truth, visibility, or final approval.
 - Keep sources, private memory, decisions and drafts private. Never compile a public draft in a context
   that still holds private sources.
@@ -91,6 +105,7 @@ Then carry on. The rest of the flow is the same either way.
 - Never manufacture a caveat to look balanced, and never hide a real one to look better.
 - Do not put a number in the title. Say what happened.
 - **Watch every second of every recording before approving it.** Publication is immutable.
+- Do not finish without a review URL, or without saying exactly what blocked one.
 
 ## Vocabulary
 
