@@ -21,6 +21,13 @@ Look for `.remixx/project.json` in the working directory.
   Do not interrogate the founder about vision, mission or strategy — they may not know yet, and it is not
   needed to show today's work.
 
+  **Then say this out loud, because it is a hard limit:** writing that file creates a _local_ identity
+  only. The project does not exist on the platform, and **staging a post for it will be rejected** —
+  `assert_chapter_bindings` returns "Chapter, media, presentation, or Project binding was rejected."
+  The founder has to create the project in their studio once, and the `projectId` in
+  `.remixx/project.json` must match the one the platform issued. Tell them that before doing the work,
+  not after, so a whole session's output does not end up unstageable.
+
 Then carry on. The rest of the flow is the same either way.
 
 ## The shape of the work
