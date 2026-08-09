@@ -145,6 +145,13 @@ Then carry on. The rest of the flow is the same either way.
     re-checks them. **This skill repo has no renderer and no narration step**, so a fresh clone can
     capture evidence but cannot yet render a recap or attach media.
 
+    **A discovered Remixx monorepo means the renderer is available.** If `~/dev/remixx` or a path the
+    founder supplied contains `packages/recap/dist/cli.js`, read
+    [video-recipe.md](references/video-recipe.md) → "When the Remixx monorepo is available" and use it.
+    Do not stop merely because the public skill repository itself has no renderer after finding the working
+    monorepo, recap CLI and `stage:media` command. Stop only after the applicable command actually refuses,
+    and report that concrete refusal.
+
     **So if media cannot be staged — no renderer is available in this environment, or the founder did not
     complete the one-click Project bootstrap — STOP without staging.** Hand over the artifact paths, say
     plainly what is missing and what would unblock it. Do not stage a crippled post just to have something
@@ -172,6 +179,14 @@ Then carry on. The rest of the flow is the same either way.
   unapproved draft path. Recording an approval that did not happen is the most expensive kind of bug this
   product can ship, and it is worse than the friction of asking.
 - Never auto-confirm truth, visibility, or final approval.
+- **Approval is scoped to the proposal immediately above it.** Confirmation of a Project name and promise
+  approves only that Project proposal. It does not approve Report facts, source visibility, privacy, post
+  text, narration or media. Likewise, "continue" after Project creation is not public-content approval.
+- **Show the actual public content in chat before recording its approval.** Before writing
+  `report-visibility-decisions.v1`, show every proposed public item and source. Before invoking
+  `approve-chapter`, show the complete title, dek, movement, hooks/edges and disclosure. Never write
+  `reviewedBy`, `approvedBy`, `founderApprovalState: "approved"` or an approval timestamp from a role label
+  such as `Founder`; those fields describe an event that must have happened in the current conversation.
 - Keep sources, private memory, decisions and drafts private. Never compile a public draft in a context
   that still holds private sources.
 - Never invent movement, failure, rationale, an observation, or a change of mind. If a session produced
@@ -190,6 +205,12 @@ Then carry on. The rest of the flow is the same either way.
   keyed, so that post can never gain its media afterwards. Stop, hand over the artifact paths, and say what
   is missing.
 - Do not finish without a review URL, or without saying exactly what blocked one.
+- **Keep report machinery out of the Project being reported on.** Put private/generated work under
+  `.remixx/`, ensure capture profiles and configs are gitignored before launching a browser, and never add
+  a Project-specific artifact-builder script or commit report plumbing to the product repository.
+- **Never delete finalized artifacts to make an overwrite guard pass.** If a run changes, mint a new run
+  directory or new artifact IDs. Broad deletion such as `rm -f .remixx/artifacts/*.json` destroys capture
+  cues and the evidence needed to detect changed content.
 
 ## Vocabulary
 

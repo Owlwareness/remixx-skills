@@ -20,6 +20,7 @@ import {
   decodeGrayPng,
   summariseFrames,
 } from "./content-assertions.mjs";
+import { probeWebm } from "./webm-metadata.mjs";
 
 const argument = (name) => {
   const index = process.argv.indexOf(`--${name}`);
@@ -776,14 +777,25 @@ try {
   );
 }
 
-const outputSha256 = createHash("sha256")
-  .update(await readFile(outputPath))
-  .digest("hex");
+const outputBytes = await readFile(outputPath);
+const outputSha256 = createHash("sha256").update(outputBytes).digest("hex");
+let media;
+try {
+  media = probeWebm(outputBytes);
+} catch (error) {
+  await rm(outputPath, { force: true });
+  await rm(cuePath, { force: true });
+  throw new Error(
+    `Capture rejected and discarded -- emitted WebM metadata is invalid: ${error.message}`,
+    { cause: error },
+  );
+}
 const cueArtifact = {
   schemaVersion: "browser-capture-cues.v2",
   url: `${parsedUrl.origin}${parsedUrl.pathname}`,
   viewport,
-  durationMs: Date.now() - startedAt,
+  durationMs: media.durationMs,
+  media,
   videoSha256: outputSha256,
   cues,
   structuralRedactions: redactionManifest,
@@ -800,6 +812,7 @@ process.stdout.write(
       cuePath,
       cueSha256: createHash("sha256").update(cueBytes).digest("hex"),
       cueCount: cues.length,
+      media,
       contentAssertions: contentReport,
     },
     null,

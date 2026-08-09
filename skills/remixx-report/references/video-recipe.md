@@ -206,6 +206,11 @@ The emitted cue artifact is `browser-capture-cues.v2` and carries a `contentAsse
 measured `readyState`, dimensions, playback advance, frame count, `peakStdDev`, `maxInterFrameDelta` and
 the thresholds applied. **Quote those numbers** rather than asserting that the recording worked.
 
+It also carries a `media` block decoded from the emitted WebM bytes: codec, mime, width, height and exact
+duration. Use those values in every asset manifest. Do not use the requested viewport or elapsed action
+time; a real Plinth capture took 11.2 seconds of scripted actions but encoded a 15.04-second WebM, enough for
+the server's exact decoder to reject the wrong declaration.
+
 ## Cue kinds
 
 `cut`, `playVideo`, `push`, `pan`, `zoomTo`, `drawBox`, `drawArrow`, `label`, `cursor`, `strike`.
@@ -258,6 +263,30 @@ and you will make it again. They should not have to steer each step to get a res
 see the result and say yes or no.
 
 ## Staging
+
+### When the Remixx monorepo is available
+
+Finding a Remixx checkout with `packages/recap/dist/cli.js` means narration/rendering is available even
+though this public repository does not bundle it. Build a recap asset manifest beside the capture from the
+cue artifact's byte-derived `media` values, then run from that checkout:
+
+```sh
+node packages/recap/dist/cli.js \
+  --chapter <approved-post.json> \
+  --assets <recap-assets.json> \
+  --output <recap.mp4> \
+  --narrator auto
+
+pnpm --filter @remixx/web stage:media -- \
+  --chapter <approved-post.json> \
+  --presentation <recap.manifest.json> \
+  --assets <recap.stage-assets.json>
+```
+
+Load the checkout's configured narration environment without printing it. The render emits both the public
+presentation manifest and the staging asset list. Use those emitted paths; do not hand-build a media staging
+payload. If the checkout exists, do not report "the public repo has no renderer" as a blocker without
+running the render command and naming its actual refusal.
 
 **Staging text-only when a screencast or a rendered recap exists is FORBIDDEN, not a fallback.** Staging is
 keyed by content hash: a post staged without media can never afterwards gain media under the same hash — the
