@@ -250,17 +250,16 @@ render it.
 
 Two things are still required and are not matters of taste:
 
-- **Privacy approval** (`privacy.founderApprovalState`) before rendering. This is what confirms the founder
-  agreed to what becomes public, and it is the truth boundary rather than an opinion about the video.
-- **Say when an asset changes after you showed it.** A previous run showed a 5.4s clip and staged a 12.48s
-  re-record under the same approval. If what you staged is not what they saw, that is a provenance problem,
-  not a formality.
+- Keep `privacy.founderApprovalState` **pending** while producing a private review draft. Do not manufacture
+  founder approval just to render. The authenticated **Post** action is where the founder accepts the exact
+  formatted post and media that become public.
+- Keep every rendered/staged asset hash-bound. If an asset changes, rebuild the presentation and stage the
+  new bytes. Never reuse an earlier render binding for a changed output.
 
 Founder presentation edits retain claim references and use founder-edited provenance.
 
-And when you hand the video over, say that if they want it different they can just tell you what to change
-and you will make it again. They should not have to steer each step to get a result they like; they should
-see the result and say yes or no.
+When handing the video over, return the review URL rather than pasting the script into chat. Add one short
+line saying they can request changes in chat, or press **Post** on the preview if it looks good.
 
 ## Staging
 
@@ -292,15 +291,17 @@ running the render command and naming its actual refusal.
 keyed by content hash: a post staged without media can never afterwards gain media under the same hash — the
 retry answers `duplicate: true` — so the "rescue" permanently ruins the post it was trying to rescue.
 
-Use the bounded `chapter-media-stage.v1` flow, only after exact-preview approval:
+Use the bounded `chapter-media-stage.v1` flow after the report agent has prepared and hash-bound the complete
+private-review bundle. The legacy field named `exactPreviewApproval` is a render-binding envelope during
+this migration; its `approvedBy` must identify the report agent, never the founder:
 
-1. POST the approved chapter, approved media manifest, renderer-produced `chapter-recap-video.v1` public
-   presentation, four-hash exact-preview approval, and a fresh upload token as the `manifest` action.
+1. POST the agent-prepared chapter, media manifest, renderer-produced `chapter-recap-video.v1` public
+   presentation, four-hash render binding, and a fresh upload token as the `manifest` action.
 2. PUT each server-requested asset as `application/octet-stream` with the upload token as a bearer token.
-   Upload only files whose bytes match the approved manifest hashes.
+   Upload only files whose bytes match the prepared manifest hashes.
 3. POST the returned stage ID and the same upload token as the `finalize` action.
-4. Return the authenticated review URL. **Never call Publish**, and never upload private plans, raw or
-   unapproved captures, contact sheets, or unapproved alternates.
+4. Return the authenticated review URL. **Never press Post**, and never upload private plans, raw captures,
+   contact sheets or alternates that are not part of the finished preview.
 
 Do not improvise that flow per run. The reproducible command is
 `apps/web/scripts/stage-chapter-media.mts` in the Remixx monorepo, run as
@@ -329,6 +330,6 @@ Never take `width`, `height`, `durationMs` or `mime` from the render plan or fro
 endpoint re-decodes every uploaded byte and compares exactly; a real render off by 4ms is enough to be
 rejected. Derive them from the decode.
 
-The private `report-video-plan.v1` is an editorial and approval artifact, not the public presentation
+The private `report-video-plan.v1` is an editorial preparation artifact, not the public presentation
 contract. Require the renderer to preserve it and emit the validated, hash-bound public presentation
-manifest. Fail closed if the renderer cannot represent the approved plan without silently changing it.
+manifest. Fail closed if the renderer cannot represent the prepared plan without silently changing it.

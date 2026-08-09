@@ -6,7 +6,8 @@ description: Turn a real working session into a short, watchable post — a vide
 # Show what you did today
 
 Take a real working session and produce **one short video someone would actually watch**, plus private
-memory of the work. Then stage it so the founder can see it as a real post and decide whether to publish.
+memory of the work. Then stage the finished video and formatted post behind one clickable review URL. The
+founder sees the real result there and either presses **Post** or returns to chat with an edit.
 
 The founder does the work. This skill does the showing.
 
@@ -17,9 +18,14 @@ Look for `.remixx/project.json` in the working directory.
 - **It exists** → read it for identity and continue below. If the founder says it has never been created
   on Remixx, or an earlier stage failed because its Project binding was missing, use the bootstrap command
   below with that identity before continuing.
-- **It does not exist** → this is a new project. Ask only for a name, a short one-line description of
-  what it is, and confirmation of the directory. Do not interrogate the founder about vision, mission or
-  strategy — they may not know yet, and none of that is needed to show today's work.
+- **It does not exist** → this is a new project. Infer a name, slug, one-line public promise and directory
+  from the work. Show one compact Project suggestion with the normal conversational choices: **Create**,
+  **Edit**, or **Cancel**. Do not ask the founder to invent the fields, and do not interrogate them about
+  vision, mission or strategy. This is the only routine chat gate in a first report.
+
+  After **Create**, execute the approved Project creation through an available authenticated Remixx client
+  or authenticated browser session. Do not make the founder review the same fields on a second form. If
+  authentication has never been connected, ask only for that one-time connection, then resume the same run.
 
   Create the portable local identity with the runner; do not hand-author a `project-seed.v1`:
 
@@ -28,21 +34,19 @@ Look for `.remixx/project.json` in the working directory.
     --name <name> --slug <slug> --out .remixx/project.json
   ```
 
-  Then turn that identity and the founder's exact one-line description into the one-click Remixx URL:
+  The legacy bootstrap URL remains a compatibility mechanism, not another founder decision:
 
   ```sh
   node bin/remixx-artifact.mjs project-bootstrap-url \
     --project .remixx/project.json \
-    --description <founder's-exact-words>
+    --description <approved-one-line-promise>
   ```
 
-  Show the full URL and pause. **Have the founder open the Remixx studio and sign in first, then open the
-  full bootstrap URL.** Do not send them through sign-in from the bootstrap URL: the current auth redirect
-  does not preserve its token. Ask them to review the three visible fields and press **Create Project**.
-  Continue only after they confirm it succeeded. That one authenticated click records the founder as
-  approver, creates the internal seed, adds an honest default brief and contribution policy, publishes the
-  Project publicly, and preserves the exact `projectId` from the working directory so staging can bind
-  immediately. The agent does not sign in, approve, or publish anything itself.
+  When no creator client exists but the host can drive an already authenticated browser, open that URL and
+  submit the exact approved fields on the founder's behalf. Their **Create** response authorized that exact
+  Project mutation. Never change the fields, publish a different Project or treat the Project approval as
+  post approval. If neither authenticated capability exists, report the missing one-time connection rather
+  than pretending the no-form flow succeeded.
 
   **There is no seed checkpoint in this path.** Never send a fresh report through
   `remixx-start-project`, ask the founder to hand-author or paste a `project-seed.v1`, or send them through
@@ -57,12 +61,15 @@ Then carry on. The rest of the flow is the same either way.
 2. **Find the story that is already in it.** One clear thing usually carries a post. Do not pick a
    structure and then look for content to fill it. Read
    [video-recipe.md](references/video-recipe.md) before planning shots.
-3. **Bound the sources.** Show which exact source bytes may reach the model before using them. Read
+3. **Bound the sources.** Decide which exact source bytes may reach the model before using them. Read
    [privacy.md](references/privacy.md) and
    [report-protocol.md](references/report-protocol.md).
 4. **Create private memory** — a `report.v1` from manifested evidence. Finalize and validate it with the
    artifact CLI.
-5. **Pause for truth and visibility decisions**, showing every candidate item and source.
+5. **Prepare a conservative private-review draft without another chat gate.** Include only claims verified
+   by the session/repository and public-safe evidence. Omit secrets, credentials, personal data, absolute
+   paths, private logs and anything uncertain. Record the report agent—not the founder—as the preparer of
+   visibility decisions. A staged draft is not public and is not founder-approved.
 6. **Build the approved public set** deterministically:
 
    ```sh
@@ -74,7 +81,7 @@ Then carry on. The rest of the flow is the same either way.
 
 7. **Compile the public draft** in a fresh context containing only the approved items. If the host cannot
    isolate that context, stop and hand over the approved-items path.
-8. **Plan the shot list, and show it to the founder with the script.** Before opening a browser, write down
+8. **Plan the shot list internally.** Before opening a browser, write down
    the states the product goes through, in order, and for each one name **what visibly changes**. Three to
    five is plenty. Then drive the product the way a person would to make that change happen, and let each
    result sit on screen for a moment. Do not reload the page between shots unless the reload is the point —
@@ -84,17 +91,19 @@ Then carry on. The rest of the flow is the same either way.
 9. **Capture the evidence and make the video.** Drive the real product into each state on the shot list and
    record it. Use `scripts/capture_browser_demo.mjs` — never hand-drive a browser with inline scripts.
    Validate the plan with `scripts/validate_video_plan.mjs`.
-10. **Look at what you made, then show the founder the finished thing.** A quick look is enough — is the
+10. **Look at what you made.** A quick look is enough — is the
     product visibly doing something, is anything obviously broken. You do not have to certify the video, and
     you should not spend the session on frame-by-frame self-review; the capture script already refuses a
-    blank or frozen recording, and taste is the founder's call. Render, show the finished video with audio,
-    and get the exact-preview approval bound to all four hashes.
-11. **Approve and export**, only after explicit approval:
+    blank or frozen recording. Render the finished video with audio. Keep founder/privacy approval pending;
+    this is an agent-prepared private preview, not a public post.
+11. **Mark and export the private-review draft under the report agent's identity.** Never use the founder's
+    name here. This legacy `approved` field means the bundle is internally complete enough to stage; the
+    authenticated **Post** click remains the only founder publication approval:
 
     ```sh
     node bin/remixx-artifact.mjs approve-chapter \
       --input <draft-chapter.json> \
-      --approved-by <name> \
+      --approved-by "Remixx report agent" \
       --approved-at <ISO-8601> \
       --out <approved-chapter.json>
 
@@ -158,11 +167,15 @@ Then carry on. The rest of the flow is the same either way.
     to link to; that spends the post's only hash on a version with no video in it. The run then ends with an
     exact statement of what blocked the review URL, which is the other half of the rule above.
 
-13. **Hand over the review URL as the last line of your response, and offer to change it.** The founder
-    refreshes their studio, sees the post as it will actually appear, and chooses Publish or Dismiss. Say
-    plainly that if they do not like it — the video, the script, the framing, any of it — they can just tell
-    you what to change and you will make it again. They should not have to approve each step to get there;
-    they should see the result and say yes or no.
+13. **Hand over only the useful result.** Do not paste title/dek/body blocks into chat or ask whether each
+    intermediate is okay. End with a clickable review URL and one short reminder, for example:
+
+    > [See your finished post and video](review-url)
+    >
+    > Want changes? Tell me here and I will rebuild the preview. If it looks good, press **Post** there.
+
+    The review URL must render the formatted post and playable final video using the same component that
+    publication uses. **Post** is the single authenticated publication action. Dismiss remains available.
 
     One mechanic to be straight about if they do ask for a different video: staging is keyed on the post's
     exact content hash, so if the post text is unchanged the platform returns the existing staged record
@@ -172,21 +185,23 @@ Then carry on. The rest of the flow is the same either way.
 
 ## Rules
 
-- Do not sign in, call the database directly, or publish. Publication is the founder's, always.
+- Do not call the database directly or publish. Publication is the founder's authenticated **Post** click,
+  always. An exact Project **Create** response may authorize an authenticated client/browser to create only
+  that proposed Project.
 - **Never write the founder's name into an approval field for an approval they did not give.** The
   approval fields on the artifact are a provenance claim, not a formality. If the founder has not said yes
   in this session, you may not pass their name to `--approved-by`. Ask, or stop and hand over the
   unapproved draft path. Recording an approval that did not happen is the most expensive kind of bug this
   product can ship, and it is worse than the friction of asking.
-- Never auto-confirm truth, visibility, or final approval.
+- Never claim the founder approved truth, visibility, media or post text before they press **Post**. The
+  report agent may conservatively prepare those choices for a private preview under its own identity.
 - **Approval is scoped to the proposal immediately above it.** Confirmation of a Project name and promise
   approves only that Project proposal. It does not approve Report facts, source visibility, privacy, post
   text, narration or media. Likewise, "continue" after Project creation is not public-content approval.
-- **Show the actual public content in chat before recording its approval.** Before writing
-  `report-visibility-decisions.v1`, show every proposed public item and source. Before invoking
-  `approve-chapter`, show the complete title, dek, movement, hooks/edges and disclosure. Never write
-  `reviewedBy`, `approvedBy`, `founderApprovalState: "approved"` or an approval timestamp from a role label
-  such as `Founder`; those fields describe an event that must have happened in the current conversation.
+- **Do not turn report generation into a questionnaire.** Prepare the finished draft and let the founder
+  judge it at the real review URL. Agent-authored artifacts may identify `Remixx report agent`; never write
+  `reviewedBy`, `approvedBy`, `founderApprovalState: "approved"` or timestamps that imply the founder acted
+  before the authenticated **Post** click.
 - Keep sources, private memory, decisions and drafts private. Never compile a public draft in a context
   that still holds private sources.
 - Never invent movement, failure, rationale, an observation, or a change of mind. If a session produced
@@ -197,10 +212,10 @@ Then carry on. The rest of the flow is the same either way.
   its start state while narration talks over it is the most common way a video says nothing. Do not reload
   the page between shots unless the reload is the point; whatever the product has built up is gone
   afterwards. This has already produced a finished video whose canvas was blank.
-- **Show the finished video and offer to change it.** You do not need to certify it frame by frame — the
-  capture script already refuses a blank or frozen recording, and whether it is any good is the founder's
-  call. Publication is immutable, which is exactly why the founder is the gate and the post is staged rather
-  than published. If they want it different, take the note and make it again.
+- **Put the finished video at the URL and offer edits in one line.** Do not require a chat preview approval.
+  Publication is immutable, which is exactly why the authenticated **Post** button—not intermediate prose
+  approval—is the founder gate. If they request a change in chat, take the note, rebuild and return the
+  refreshed review URL.
 - **Never stage a post text-only when a screencast or a rendered recap exists.** Staging is content-hash
   keyed, so that post can never gain its media afterwards. Stop, hand over the artifact paths, and say what
   is missing.

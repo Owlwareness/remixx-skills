@@ -470,11 +470,12 @@ if (plan.approval?.status === "approved") {
   );
 }
 if (requireApproved) {
-  // Privacy approval is required and stays required: it is what confirms the
-  // founder agreed to what becomes public, and that is not a matter of taste.
+  // Rendering produces a private review draft. Founder approval belongs to the
+  // authenticated Post action after the exact formatted post and media are
+  // visible, so pending is valid here and a manufactured approval is not.
   requireValue(
-    plan.privacy?.founderApprovalState === "approved",
-    "founder privacy approval is required for rendering",
+    plan.privacy?.founderApprovalState !== "rejected",
+    "founder rejected the proposed public material; do not render it",
   );
   // Contact-sheet approval is deliberately NOT required. It used to be, which
   // meant the founder had to sign off a storyboard before anything could render
