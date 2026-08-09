@@ -36,11 +36,13 @@ Look for `.remixx/project.json` in the working directory.
     --description <founder's-exact-words>
   ```
 
-  Show the full URL and pause. Ask the founder to open it while signed in, review the three visible fields,
-  and press **Create Project**. Continue only after they confirm it succeeded. That one authenticated click
-  records the founder as approver, creates the internal seed, adds an honest default brief and contribution
-  policy, publishes the Project publicly, and preserves the exact `projectId` from the working directory so
-  staging can bind immediately. The agent does not sign in, approve, or publish anything itself.
+  Show the full URL and pause. **Have the founder open the Remixx studio and sign in first, then open the
+  full bootstrap URL.** Do not send them through sign-in from the bootstrap URL: the current auth redirect
+  does not preserve its token. Ask them to review the three visible fields and press **Create Project**.
+  Continue only after they confirm it succeeded. That one authenticated click records the founder as
+  approver, creates the internal seed, adds an honest default brief and contribution policy, publishes the
+  Project publicly, and preserves the exact `projectId` from the working directory so staging can bind
+  immediately. The agent does not sign in, approve, or publish anything itself.
 
   **There is no seed checkpoint in this path.** Never send a fresh report through
   `remixx-start-project`, ask the founder to hand-author or paste a `project-seed.v1`, or send them through
