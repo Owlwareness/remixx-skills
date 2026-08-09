@@ -14,6 +14,7 @@ import {
 } from "../lib/artifacts.mjs";
 import { artifactKinds } from "../lib/schemas.mjs";
 import { stageChapter } from "../lib/staging.mjs";
+import { createProjectBootstrapUrl } from "../lib/bootstrap.mjs";
 
 function parseArguments(values) {
   const [command, ...rest] = values;
@@ -40,6 +41,9 @@ const help = `remixx-artifact
 Commands:
   init-project --name <name> --slug <slug> --out <path>
     [--project-id <uuid>] [--vault <relative-path>]
+
+  project-bootstrap-url --project <.remixx/project.json>
+    --description <founder-words> [--origin <https-origin>]
 
   finalize --kind <project-seed|report|chapter|approved-items>
     --input <json> --out <json>
@@ -79,6 +83,16 @@ async function main() {
     process.stdout.write(
       `${await writeJsonIdempotently(required(options, "out"), value)}\n`,
     );
+    return;
+  }
+
+  if (command === "project-bootstrap-url") {
+    const url = await createProjectBootstrapUrl({
+      project: await readJson(required(options, "project")),
+      description: required(options, "description"),
+      origin: options.origin,
+    });
+    process.stdout.write(`${url}\n`);
     return;
   }
 

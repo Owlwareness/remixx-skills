@@ -14,19 +14,37 @@ The founder does the work. This skill does the showing.
 
 Look for `.remixx/project.json` in the working directory.
 
-- **It exists** → this is an existing project. Read it for identity and continue below.
-- **It does not exist** → this is a new project. Ask only what is needed to create it: a name, a short
-  one-line description of what it is, and confirmation of the directory. Write
-  `.remixx/project.json` with `schemaVersion`, `projectId` (a fresh UUID), `slug`, `name` and `vaultPath`.
-  Do not interrogate the founder about vision, mission or strategy — they may not know yet, and it is not
-  needed to show today's work.
+- **It exists** → read it for identity and continue below. If the founder says it has never been created
+  on Remixx, or an earlier stage failed because its Project binding was missing, use the bootstrap command
+  below with that identity before continuing.
+- **It does not exist** → this is a new project. Ask only for a name, a short one-line description of
+  what it is, and confirmation of the directory. Do not interrogate the founder about vision, mission or
+  strategy — they may not know yet, and none of that is needed to show today's work.
 
-  **Then say this out loud, because it is a hard limit:** writing that file creates a _local_ identity
-  only. The project does not exist on the platform, and **staging a post for it will be rejected** —
-  `assert_chapter_bindings` returns "Chapter, media, presentation, or Project binding was rejected."
-  The founder has to create the project in their studio once, and the `projectId` in
-  `.remixx/project.json` must match the one the platform issued. Tell them that before doing the work,
-  not after, so a whole session's output does not end up unstageable.
+  Create the portable local identity with the runner; do not hand-author a `project-seed.v1`:
+
+  ```sh
+  node bin/remixx-artifact.mjs init-project \
+    --name <name> --slug <slug> --out .remixx/project.json
+  ```
+
+  Then turn that identity and the founder's exact one-line description into the one-click Remixx URL:
+
+  ```sh
+  node bin/remixx-artifact.mjs project-bootstrap-url \
+    --project .remixx/project.json \
+    --description <founder's-exact-words>
+  ```
+
+  Show the full URL and pause. Ask the founder to open it while signed in, review the three visible fields,
+  and press **Create Project**. Continue only after they confirm it succeeded. That one authenticated click
+  records the founder as approver, creates the internal seed, adds an honest default brief and contribution
+  policy, publishes the Project publicly, and preserves the exact `projectId` from the working directory so
+  staging can bind immediately. The agent does not sign in, approve, or publish anything itself.
+
+  **There is no seed checkpoint in this path.** Never send a fresh report through
+  `remixx-start-project`, ask the founder to hand-author or paste a `project-seed.v1`, or send them through
+  the long brief/policy form. The bootstrap click replaces that ceremony without forging their approval.
 
 Then carry on. The rest of the flow is the same either way.
 
@@ -125,11 +143,11 @@ Then carry on. The rest of the flow is the same either way.
     re-checks them. **This skill repo has no renderer and no narration step**, so a fresh clone can
     capture evidence but cannot yet render a recap or attach media.
 
-    **So if media cannot be staged — no renderer available in this environment, or the project is not
-    registered on the platform — STOP without staging.** Hand over the artifact paths, say plainly what is
-    missing and what would unblock it. Do not stage a crippled post just to have something to link to;
-    that spends the post's only hash on a version with no video in it. The run then ends with an exact
-    statement of what blocked the review URL, which is the other half of the rule above.
+    **So if media cannot be staged — no renderer is available in this environment, or the founder did not
+    complete the one-click Project bootstrap — STOP without staging.** Hand over the artifact paths, say
+    plainly what is missing and what would unblock it. Do not stage a crippled post just to have something
+    to link to; that spends the post's only hash on a version with no video in it. The run then ends with an
+    exact statement of what blocked the review URL, which is the other half of the rule above.
 
 13. **Hand over the review URL as the last line of your response, and offer to change it.** The founder
     refreshes their studio, sees the post as it will actually appear, and chooses Publish or Dismiss. Say
