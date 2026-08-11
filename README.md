@@ -50,15 +50,17 @@ npm test
 The schemas under each skill's `references/schemas/` directory are the
 authoritative portable contracts.
 
-## Direct AI retrieval
+## Canonical AI retrieval
 
-Give an AI one of these raw Markdown URLs:
+The public report skill is authored in this repository at
+[`skills/remixx-report/SKILL.md`](skills/remixx-report/SKILL.md). The Remixx application serves that source
+through the single stable discovery URL:
 
 ```text
-https://raw.githubusercontent.com/Owlwareness/remixx-skills/main/skills/remixx-start-project/SKILL.md
-https://raw.githubusercontent.com/Owlwareness/remixx-skills/main/skills/remixx-report/SKILL.md
+https://remixx-sepia.vercel.app/report
 ```
 
-The public repository is the protocol distribution surface. The Remixx
-platform remains the authenticated claim, publication, following, and
-participation surface.
+Give an AI that URL for report discovery. No authentication, clone, install, or existing Remixx directory is
+required to read it. The copy in the private application monorepo is a byte-identical deployment mirror; this
+public repository remains the source. The Remixx platform remains the authenticated review and publication
+surface.

@@ -168,6 +168,17 @@ for (const [index, step] of config.steps.entries()) {
   ) {
     throw new Error(`step ${index + 1} requires a selector`);
   }
+  if (
+    step.resultSelector !== undefined &&
+    (step.kind !== "click" ||
+      typeof step.resultSelector !== "string" ||
+      step.resultSelector.trim().length === 0 ||
+      step.resultSelector.length > 500)
+  ) {
+    throw new Error(
+      `step ${index + 1} resultSelector is valid only for clicks and must be 1 to 500 characters`,
+    );
+  }
   // A drag is the only way to demonstrate anything that responds to a held
   // pointer -- a canvas stroke, a slider, a map pan, a drag-and-drop. Points are
   // ratios of the target element's box so the path survives a crop and stays
@@ -656,6 +667,25 @@ for (const [index, step] of config.steps.entries()) {
   if (step.kind === "click") {
     await moveCursor(step.selector, step.moveMs);
     const { locator, rect } = await locate(step.selector);
+    const resultWasVisible = step.resultSelector
+      ? await page.locator(step.resultSelector).evaluateAll((elements) =>
+          elements.some((element) => {
+            const bounds = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return (
+              bounds.width > 0 &&
+              bounds.height > 0 &&
+              style.visibility !== "hidden" &&
+              style.display !== "none"
+            );
+          }),
+        )
+      : false;
+    if (resultWasVisible) {
+      throw new Error(
+        `resultSelector was already visible before the click and cannot prove a change: ${step.resultSelector}`,
+      );
+    }
     await page.evaluate(() => {
       const cursor = document.getElementById("remixx-report-cursor");
       cursor.animate(
@@ -667,15 +697,24 @@ for (const [index, step] of config.steps.entries()) {
         { duration: 320, easing: "ease-out" },
       );
     });
-    cues.push({
+    const clickCue = {
       atMs: Date.now() - startedAt,
       kind: "click",
       selector: step.selector,
       rect,
       durationMs: 320,
-    });
+    };
     await locator.click();
     await page.waitForTimeout(step.afterMs ?? 1000);
+    if (step.resultSelector) {
+      const result = await locate(step.resultSelector);
+      clickCue.result = {
+        atMs: Date.now() - startedAt,
+        selector: step.resultSelector,
+        rect: result.rect,
+      };
+    }
+    cues.push(clickCue);
     continue;
   }
   if (step.kind === "drag") {

@@ -1,4 +1,4 @@
 interface:
   display_name: "remixx Report"
   short_description: "Turn real work into a reviewed public post"
-  default_prompt: "Use $remixx-report to capture this work session, prepare a founder-reviewed public post, and stage it for browser review."
+  default_prompt: "Use $remixx-report to turn this work session into a truthful post and watchable video at one private review URL."
