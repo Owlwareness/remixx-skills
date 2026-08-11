@@ -52,11 +52,12 @@ command, or explain Remixx's machinery.
 4. Set `presentation.template` to `product-demo-overlay-v1`, `musicMode` to `effects`, and `captionMode` to
    `word-synced`.
 5. Put the request, evidence output, and idempotency key in a fresh OS temporary directory outside the
-   creator's Project. Evidence IDs must match `privacy.allowedEvidenceIds`; use relative media paths and
-   byte-derived metadata. Copy emitted `browser-capture-cues.v2` cues into the request. A click may name a
-   `resultSelector` only when that result is absent before the click and visibly appears because of it.
-6. Run the create invocation at the top. The skill owns truthful subject selection. The client owns capture,
-   credentials, hashing, upload, retries, idempotency, and review state; the server owns rendering.
+   creator's Project. Capture into `EVIDENCE` and write its `manifest.json`. Evidence IDs must match
+   `privacy.allowedEvidenceIds`; use relative media paths and byte-derived metadata. Copy emitted
+   `browser-capture-cues.v2` cues into the request. A click may name a `resultSelector` only when that result
+   is absent before the click and visibly appears because of it.
+6. Run the create invocation at the top. The skill owns truthful subject selection and capture execution. The
+   client owns credentials, hashing, upload, retries, idempotency, and review state; the server owns rendering.
 
 Human-readable progress is on stderr. Read stdout only as `remixx-client-result.v1` or
 `remixx-client-error.v1`; never infer state by parsing friendly prose. On success, return only:
@@ -83,4 +84,4 @@ improvise a fallback pipeline.
 - Never publish. The authenticated **Post** action on the review page is the only publication authority.
 - Never label agent preparation as creator approval.
 - Keep generated requests and receipts out of tracked Project files.
-- Do not build bootstrap, publication, storage, browser, rendering, or provider mechanics from source.
+- Do not build bootstrap, publication, storage, rendering, or provider mechanics from source.
