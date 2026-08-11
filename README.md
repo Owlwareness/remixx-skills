@@ -63,4 +63,5 @@ https://remixx-sepia.vercel.app/report
 Give an AI that URL for report discovery. No authentication, clone, install, or existing Remixx directory is
 required to read it. The copy in the private application monorepo is a byte-identical deployment mirror; this
 public repository remains the source. The Remixx platform remains the authenticated review and publication
-surface.
+surface. Before the first npm release, the source names `remixx-cli@latest`; the canonical endpoint resolves
+that marker to the exact published version as soon as npm exposes it.
