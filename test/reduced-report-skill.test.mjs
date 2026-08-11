@@ -8,7 +8,7 @@ const skill = await readFile(
 );
 
 test("the report skill is a thin editorial adapter", () => {
-  assert.ok(skill.split("\n").length <= 90);
+  assert.ok(skill.split("\n").length <= 100);
   assert.equal(
     skill.match(/^npx[^\r\n]+/m)?.[0],
     'npx --yes remixx-cli@latest report create --request "$REQUEST" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json',
@@ -18,6 +18,8 @@ test("the report skill is a thin editorial adapter", () => {
     /npx --yes remixx-cli@latest report create --request "\$REQUEST" --evidence-root "\$EVIDENCE"/,
   );
   assert.match(skill, /npx --yes remixx-cli@latest report revise/);
+  assert.match(skill, /npx --yes remixx-cli@latest login --json/);
+  assert.match(skill, /authentication_required/);
   assert.doesNotMatch(skill, /npx --yes @remixx\/cli/);
   assert.match(
     skill,

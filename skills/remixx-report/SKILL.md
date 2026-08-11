@@ -19,6 +19,15 @@ or a command names another package, stop and return this message instead of find
 `@latest` is the pre-publication bootstrap marker. The canonical `/report` response replaces it everywhere
 with the exact npm release as soon as the registry exposes one.
 
+If stdout returns `authentication_required`, connect once:
+
+```sh
+npx --yes remixx-cli@latest login --json
+```
+
+Complete the browser round trip, then retry the same create command with the same idempotency key. This is
+only account connection; do not build or bypass Project bootstrap here.
+
 The human interface is the sentence that invoked this skill. Never ask the creator to install software, run a
 command, or explain Remixx's machinery.
 
