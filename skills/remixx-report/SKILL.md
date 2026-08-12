@@ -6,91 +6,94 @@ description: Turn a real AI-assisted work session into one truthful, watchable R
 # Report this work
 
 ```sh
-npx --yes remixx-cli@latest report create --request "$REQUEST" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json
+npx --yes remixx-cli@latest report context --intent "$INTENT" --workspace "$PWD" --json
 ```
 
-This is the only create invocation. Never substitute `@remixx/cli`, `remixx`, a global install, a cached
-package, a repository script, or source code found on disk. Prepare `REQUEST`, `EVIDENCE`, and `KEY` as
-described below before running it. If npm cannot resolve `remixx-cli@latest`, reports a missing client or 404,
-or a command names another package, stop and return this message instead of finding a workaround:
+This context handshake is always first. Infer a proposed Project name and one-line public promise from the
+current Project and write `remixx-project-intent.v1` in a fresh OS temporary directory. The intent may contain
+a canonical `https://remixx.org/p/<slug>` URL only when the creator supplied it in the current conversation.
+It never contains a Project ID, filesystem path, Git diff, credential, or model-minted receipt.
 
-> Remixx client unavailable. Run exactly: `npx --yes remixx-cli@latest report create …`
+The server response is authoritative:
 
-`@latest` is the pre-publication bootstrap marker. The canonical `/report` response replaces it everywhere
-with the exact npm release as soon as the registry exposes one.
+- `mode: existing` means continue that exact owned Project. Use `recentPosts` to understand what its audience
+  has already seen and make this Report about only the new visible progress.
+- `mode: new` means this is a first post. Briefly show the proposed name, slug, and promise. Use the host's
+  native picker when it has one; otherwise ask one compact question accepting **Continue**, **Edit**, or
+  **Cancel**. Continue is the recommended default. Never print a numeric menu.
+- `mode: ambiguous` means ask the creator to choose among the returned named Project links. Never silently
+  choose a similar Project.
 
-If stdout returns `authentication_required`, connect once:
+The context call creates neither a Project nor a Report Run. Keep its opaque `resolutionToken` in the OS
+temporary directory for the create command. Do not decode, edit, log, or place it in the creator's repo.
 
-```sh
-npx --yes remixx-cli@latest login --json
-```
+## Choose the new progress
 
-Complete the browser round trip, then retry the same create command with the same idempotency key. This is
-only account connection; do not build or bypass Project bootstrap here.
-
-The human interface is the sentence that invoked this skill. Never ask the creator to install software, run a
-command, or explain Remixx's machinery.
-
-## Idea harness
-
-1. Inspect the session's `git log`, committed diff, and working-tree diff. The diff is the spine of truth. Use
-   the current transcript only when the host already provides it; never search for or reconstruct sessions.
+1. Inspect only this Project's `git log`, committed diff, working-tree diff, and runnable localhost app. The
+   diff is the spine of truth. Use the current transcript only when the host already provides it; never search
+   for or reconstruct sessions.
 2. List outcomes that now work and did not before. Drop config, lint, dependency, refactor, and test churn
    unless browser-visible behavior changed.
-3. Rank demonstrability first and importance second. Prefer an outcome localhost can show through clicks in
-   under 20 seconds. Reject activity titles; require an outcome sentence.
-4. Compare the subject with recent Project posts and skip material repeats. If nothing passes, return
-   `no_visible_change` with the concrete reason. Never manufacture a post.
-5. Select one subject. It becomes `story.title`; the so-what becomes `story.caption`; one visible change
-   becomes one continuous capture run. Do not show candidates, scripts, or capture plans for approval.
+3. Compare candidates with every returned `recentPosts` title, caption, and outcome. A later phase must show
+   the delta since the latest publication—not retell the first post with a new caption.
+4. Rank demonstrability first and importance second. Prefer an outcome localhost can show through clicks in
+   under 20 seconds. Reject activity titles; require one outcome sentence.
+5. Select the strongest non-repeating subject yourself. Do not ask the creator to approve routine editorial
+   choices. If nothing genuinely new is visible, return `no_visible_change` with the concrete reason.
 
-## Create the report
+## Capture and create
 
-1. Exclude secrets, personal data, private logs, absolute paths, and uncertain claims. Render new
-   user-generated text as text, never HTML.
-2. For an existing Project, continue without a routine question. For a new Project, show only the proposed
-   name, slug, and one-line public promise, followed by this terminal picker exactly:
+Write `remixx-report-request.v3`. It has `continuity`, never `project.projectId`:
 
-   `1 approve · 2 edit · 3 cancel`
+- first post: `basePostId` and `basePublicationHash` are `null`;
+- continuation: copy the latest context watermark exactly;
+- `newOutcome` states what is visibly possible now that the recent posts did not already demonstrate.
 
-   That response authorizes only the Project proposal. Ask nothing else.
+Use 3–5 accumulated observable states. Only the first state must navigate; later states continue from prior
+state unless they intentionally change route. End each decisive state with an 800ms hold. Use exactly one
+allowed evidence ID for the continuous screencast. Keep narration within 2.5 spoken words per second. Set
+`product-demo-overlay-v1`, `effects`, and `word-synced` presentation values. Exclude secrets, personal data,
+private logs, absolute paths, and uncertain claims.
 
-3. Write a `remixx-report-request.v2`. Use 3–5 observable states in one browser run; only the first state
-   navigates. Continue accumulated product state thereafter. End each decisive action with an 800ms hold.
-   Cap narration at 2.5 spoken words per second; caption-only is valid.
-4. Set `presentation.template` to `product-demo-overlay-v1`, `musicMode` to `effects`, and `captionMode` to
-   `word-synced`.
-5. Put the request, evidence output, and idempotency key in a fresh OS temporary directory outside the
-   creator's Project. Capture into `EVIDENCE` and write its `manifest.json`. Evidence IDs must match
-   `privacy.allowedEvidenceIds`; use relative media paths and byte-derived metadata. Copy emitted
-   `browser-capture-cues.v2` cues into the request. A click may name a `resultSelector` only when that result
-   is absent before the click and visibly appears because of it.
-6. Run the create invocation at the top. The skill owns truthful subject selection and capture execution. The
-   client owns credentials, hashing, upload, retries, idempotency, and review state; the server owns rendering.
+The client—not the agent—executes Playwright, draws interactions, probes the resulting bytes, and writes the
+evidence manifest:
 
-Human-readable progress is on stderr. Read stdout only as `remixx-client-result.v1` or
-`remixx-client-error.v1`; never infer state by parsing friendly prose. On success, return only:
+```sh
+npx --yes remixx-cli@latest report capture --request "$REQUEST" --output-dir "$EVIDENCE" --json
+```
+
+Then create the resolved draft:
+
+```sh
+npx --yes remixx-cli@latest report create --request "$REQUEST" --resolution-token "$RESOLUTION" --workspace "$PWD" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json
+```
+
+Use only `remixx-cli@latest`. Never substitute a global install, cached package, repository script, local
+Remixx source, credentials, another dev folder, an old transcript, or a Project ID found on disk. If the
+package is unavailable, stop with `Remixx client unavailable` rather than building a workaround.
+
+If stdout returns `authentication_required`, run `npx --yes remixx-cli@latest login --json`, complete the
+browser connection, and retry the identical command and idempotency key. Read stdout only as versioned JSON;
+human-readable progress is on stderr.
+
+On success, return only:
 
 > [See your finished post and video](reviewUrl)
 >
-> Want changes? Tell me here. If it looks good, press **Post** there.
+> Want changes? Tell me here. If it looks good, press **Post to _Project name_** there.
+
+The review may be a new-Project draft even though no Project exists yet. Pressing **Post** is the sole
+authority that atomically creates that Project and publishes its first post. Never publish from the agent.
 
 ## Edits
 
-Resolve the current Run, translate the creator's ordinary-language edit into a
-`remixx-report-revision-request.v1`, inherit unchanged evidence by hash, and invoke:
+Translate ordinary-language feedback into `remixx-report-revision-request.v2`, inherit unchanged evidence by
+hash, capture only when visible evidence changes, and invoke:
 
 ```sh
 npx --yes remixx-cli@latest report revise --request "$REQUEST" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json
 ```
 
+Revision custody comes from the Run. Never resolve or accept a different Project destination during revise.
 Return the same review URL when ready. On error, report the stable `code` and concise `message`; do not
 improvise a fallback pipeline.
-
-## Boundaries
-
-- The client supports localhost web applications only. Return `unsupported_capture_target` for anything else.
-- Never publish. The authenticated **Post** action on the review page is the only publication authority.
-- Never label agent preparation as creator approval.
-- Keep generated requests and receipts out of tracked Project files.
-- Do not build bootstrap, publication, storage, rendering, or provider mechanics from source.

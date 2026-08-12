@@ -11,26 +11,29 @@ test("the report skill is a thin editorial adapter", () => {
   assert.ok(skill.split("\n").length <= 100);
   assert.equal(
     skill.match(/^npx[^\r\n]+/m)?.[0],
-    'npx --yes remixx-cli@latest report create --request "$REQUEST" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json',
+    'npx --yes remixx-cli@latest report context --intent "$INTENT" --workspace "$PWD" --json',
   );
   assert.match(
     skill,
-    /npx --yes remixx-cli@latest report create --request "\$REQUEST" --evidence-root "\$EVIDENCE"/,
+    /npx --yes remixx-cli@latest report capture --request "\$REQUEST" --output-dir "\$EVIDENCE"/,
+  );
+  assert.match(
+    skill,
+    /npx --yes remixx-cli@latest report create --request "\$REQUEST" --resolution-token "\$RESOLUTION" --workspace "\$PWD" --evidence-root "\$EVIDENCE"/,
   );
   assert.match(skill, /npx --yes remixx-cli@latest report revise/);
   assert.match(skill, /npx --yes remixx-cli@latest login --json/);
   assert.match(skill, /authentication_required/);
   assert.doesNotMatch(skill, /npx --yes @remixx\/cli/);
-  assert.match(
-    skill,
-    /Remixx client unavailable\. Run exactly: `npx --yes remixx-cli@latest report create …`/,
-  );
-  assert.match(skill, /remixx-client-result\.v1/);
+  assert.match(skill, /Remixx client unavailable/);
+  assert.match(skill, /remixx-report-request\.v3/);
+  assert.match(skill, /Never print a numeric menu/);
+  assert.match(skill, /never `project\.projectId`/);
+  assert.doesNotMatch(skill, /1 approve|2 edit|3 cancel/i);
   assert.match(skill, /idempotency-key/);
   for (const forbidden of [
     "ELEVENLABS_API_KEY",
     "ffmpeg",
-    "Playwright",
     "Remotion",
     "chapter-media-stage",
     "exactPreviewApproval",
