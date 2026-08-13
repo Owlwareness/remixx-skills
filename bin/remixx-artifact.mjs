@@ -2,19 +2,15 @@
 
 import {
   approveChapter,
-  approveSeed,
   buildApprovedPublicItems,
-  createProjectIdentity,
   exportChapter,
   finalizeArtifact,
   readJson,
   validateArtifact,
-  verifyProjectSeedIdentity,
   writeJsonIdempotently,
 } from "../lib/artifacts.mjs";
 import { artifactKinds } from "../lib/schemas.mjs";
 import { stageChapter } from "../lib/staging.mjs";
-import { createProjectBootstrapUrl } from "../lib/bootstrap.mjs";
 
 function parseArguments(values) {
   const [command, ...rest] = values;
@@ -39,21 +35,10 @@ function required(options, key) {
 const help = `remixx-artifact
 
 Commands:
-  init-project --name <name> --slug <slug> --out <path>
-    [--project-id <uuid>] [--vault <relative-path>]
-
-  project-bootstrap-url --project <.remixx/project.json>
-    --description <founder-words> [--origin <https-origin>]
-
-  finalize --kind <project-seed|report|chapter|approved-items>
+  finalize --kind <report|chapter|approved-items>
     --input <json> --out <json>
 
   validate --kind <${artifactKinds.join("|")}> --input <json>
-
-  verify-project-seed --project <.remixx/project.json> --seed <seed.json>
-
-  approve-seed --input <json> --approved-by <name>
-    --approved-at <ISO-8601> --out <json>
 
   build-approved-items --report <json> --decisions <json> --out <json>
     [--artifact-id <uuid>]
@@ -73,29 +58,6 @@ async function main() {
     return;
   }
 
-  if (command === "init-project") {
-    const value = await createProjectIdentity({
-      name: required(options, "name"),
-      slug: required(options, "slug"),
-      vaultPath: options.vault ?? "project-brain",
-      projectId: options["project-id"],
-    });
-    process.stdout.write(
-      `${await writeJsonIdempotently(required(options, "out"), value)}\n`,
-    );
-    return;
-  }
-
-  if (command === "project-bootstrap-url") {
-    const url = await createProjectBootstrapUrl({
-      project: await readJson(required(options, "project")),
-      description: required(options, "description"),
-      origin: options.origin,
-    });
-    process.stdout.write(`${url}\n`);
-    return;
-  }
-
   if (command === "finalize") {
     const value = await finalizeArtifact(
       required(options, "kind"),
@@ -112,31 +74,6 @@ async function main() {
     const value = await readJson(required(options, "input"));
     await validateArtifact(kind, value);
     process.stdout.write(`${kind}:valid\n`);
-    return;
-  }
-
-  if (command === "verify-project-seed") {
-    const result = await verifyProjectSeedIdentity({
-      project: await readJson(required(options, "project")),
-      seed: await readJson(required(options, "seed")),
-    });
-    process.stdout.write(
-      `project-seed:bound:${result.projectId}:${result.seedId}\n`,
-    );
-    return;
-  }
-
-  if (command === "approve-seed") {
-    const value = await approveSeed(
-      await readJson(required(options, "input")),
-      {
-        approvedBy: required(options, "approved-by"),
-        approvedAt: required(options, "approved-at"),
-      },
-    );
-    process.stdout.write(
-      `${await writeJsonIdempotently(required(options, "out"), value)}\n`,
-    );
     return;
   }
 

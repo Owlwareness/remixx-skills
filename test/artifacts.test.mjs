@@ -2,23 +2,15 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   approveChapter,
-  approveSeed,
   buildApprovedPublicItems,
-  createProjectIdentity,
   exportChapter,
   finalizeArtifact,
   validateArtifact,
-  verifyProjectSeedIdentity,
 } from "../lib/artifacts.mjs";
 import { stageChapter } from "../lib/staging.mjs";
 
 const ids = {
   project: "11111111-1111-4111-8111-111111111111",
-  seed: "22222222-2222-4222-8222-222222222222",
-  statement: "33333333-3333-4333-8333-333333333333",
-  assumption: "44444444-4444-4444-8444-444444444444",
-  constraint: "55555555-5555-4555-8555-555555555555",
-  experiment: "66666666-6666-4666-8666-666666666666",
   report: "77777777-7777-4777-8777-777777777777",
   source: "88888888-8888-4888-8888-888888888888",
   promise: "99999999-9999-4999-8999-999999999999",
@@ -32,71 +24,6 @@ const ids = {
 
 const at = "2026-07-18T18:00:00.000Z";
 const later = "2026-07-18T19:00:00.000Z";
-
-async function draftSeed() {
-  return finalizeArtifact("project-seed", {
-    schemaVersion: "project-seed.v1",
-    projectId: ids.project,
-    seedId: ids.seed,
-    project: {
-      name: "NoteRelay",
-      slug: "noterelay",
-      possibleFuture:
-        "Any messy set of meeting notes can become a clear, shared action list.",
-      purpose:
-        "Reduce dropped follow-ups by turning scattered notes into tracked actions.",
-      whyNow:
-        "Teams keep decisions in ad hoc documents that nobody revisits after a meeting.",
-      currentState:
-        "A founder-approved seed exists; no new implementation work is claimed yet.",
-    },
-    originStatements: [
-      {
-        statementId: ids.statement,
-        provenanceKind: "founder_recollection",
-        text: "A recurring frustration: action items agreed in a meeting quietly disappear.",
-        sourceLabel: "Founder conversation",
-      },
-    ],
-    assumptions: [
-      {
-        assumptionId: ids.assumption,
-        statement:
-          "Ordinary meeting notes contain enough structure to extract owned action items.",
-        evidenceNeeded:
-          "A parser run over sample notes with precision and recall observations.",
-      },
-    ],
-    constraints: [
-      {
-        constraintId: ids.constraint,
-        statement:
-          "Remembered prior work must not be presented as observed git history.",
-      },
-    ],
-    experimentLadder: [
-      {
-        experimentId: ids.experiment,
-        order: 1,
-        hypothesis:
-          "A small fixture of notes can drive a deterministic list of action items.",
-        action:
-          "Parse a sample notes file, extract one owner-and-task pair, and print it.",
-        successSignal:
-          "The same fixture produces the same structured action list each run.",
-        pivotIf:
-          "Use a hand-labeled notes sample before attempting free-form parsing.",
-      },
-    ],
-    repositoryUrl: null,
-    approval: {
-      status: "draft",
-      approvedBy: null,
-      approvedAt: null,
-    },
-    createdAt: at,
-  });
-}
 
 async function substantiveReport() {
   return finalizeArtifact("report", {
@@ -272,45 +199,6 @@ async function draftChapter(approvedItems) {
     generatedAt: later,
   });
 }
-
-test("finalizes and explicitly approves a public-safe Project seed", async () => {
-  const draft = await draftSeed();
-  assert.equal(draft.approval.status, "draft");
-  assert.match(draft.contentHash, /^[0-9a-f]{64}$/);
-
-  const approved = await approveSeed(draft, {
-    approvedBy: "Founder",
-    approvedAt: later,
-  });
-  assert.equal(approved.approval.status, "approved");
-  assert.notEqual(approved.contentHash, draft.contentHash);
-  await validateArtifact("project-seed", approved);
-});
-
-test("creates stable Project identity and rejects unsafe vault paths", async () => {
-  const project = await createProjectIdentity({
-    projectId: ids.project,
-    name: "NoteRelay",
-    slug: "noterelay",
-    vaultPath: "project-brain",
-  });
-  assert.equal(project.schemaVersion, "remixx-project.v1");
-  const seed = await draftSeed();
-  assert.deepEqual(await verifyProjectSeedIdentity({ project, seed }), {
-    projectId: ids.project,
-    seedId: ids.seed,
-  });
-
-  await assert.rejects(
-    createProjectIdentity({
-      projectId: ids.project,
-      name: "NoteRelay",
-      slug: "noterelay",
-      vaultPath: "../private",
-    }),
-    /schema validation failed/,
-  );
-});
 
 test("builds the exact public subset and exports only an approved Chapter", async () => {
   const report = await substantiveReport();

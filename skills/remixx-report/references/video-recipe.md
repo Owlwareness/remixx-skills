@@ -315,9 +315,9 @@ decoder, and this skill repo has no renderer yet. A fresh clone can capture evid
 recap or attach media.
 
 **If media cannot be staged, STOP without staging.** Two cases matter in practice: no renderer is available
-in this environment, or the founder did not complete the one-click Project bootstrap, so the bindings will
-be rejected. Either way, hand over the artifact paths, say plainly what is missing and what would unblock
-it, and stage nothing. A crippled post is worse than no post, because the hash is spent.
+in this environment, or the Report context/create flow did not produce the required hosted binding. Either
+way, hand over the artifact paths, say plainly what is missing and what would unblock it, and stage nothing.
+A crippled post is worse than no post, because the hash is spent.
 
 That is not permission to end quietly. **The run never ends without either a review URL or an exact
 statement of what blocked one** — name the missing piece, not a vague apology.

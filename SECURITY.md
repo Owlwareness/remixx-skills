@@ -10,7 +10,6 @@ or private repository contents to a public issue.
 Only these artifacts are intended to leave a founder-controlled work
 environment:
 
-- an explicitly approved `project-seed.v1`; and
 - an explicitly approved public `chapter.v1`.
 
 The CLI rejects common credential patterns, known private Report fields,

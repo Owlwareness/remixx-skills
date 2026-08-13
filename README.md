@@ -1,21 +1,17 @@
 # remixx skills
 
-Open, vendor-neutral rituals for turning conversations into living Projects and
-real work into truthful public Chapters.
+Open, vendor-neutral rituals for turning real work into truthful public
+Chapters.
 
-This repository contains two independent skills:
+This repository contains one independent skill:
 
-- [`remixx-start-project`](skills/remixx-start-project/SKILL.md) turns an
-  explicit conversation or founder document into a reviewed
-  `project-seed.v1`.
 - [`remixx-report`](skills/remixx-report/SKILL.md) turns a bounded period of
   real Project work into private memory and, after two human gates, an approved
   public `chapter.v1`.
 
 Any capable AI can retrieve and follow the Markdown directly. Codex-compatible
-hosts may install the skill folders and invoke `$remixx-start-project` or
-`$remixx-report`. Hosts with slash-command routing may expose `/start-project`
-and `/report`.
+hosts may install the skill folder and invoke `$remixx-report`. Hosts with
+slash-command routing may expose `/report`.
 
 ## Trust boundary
 
@@ -24,14 +20,13 @@ credentials. They produce reviewed portable artifacts and may stage only the
 final approved public Chapter in a steward-only inbox:
 
 ```text
-conversation → approved project-seed.v1
 real work → private report.v1 → approved public chapter.v1 → pending inbox
 ```
 
-Authentication begins in the separate hosted platform session that claims a
-Project seed or reviews and publishes a pending Chapter. Staging grants no
-publication authority. Private Reports, raw sources, visibility decisions, and
-draft Chapters do not cross that boundary.
+Authentication begins in the separate hosted platform session that reviews and
+publishes a pending Chapter. Staging grants no publication authority. Private
+Reports, raw sources, visibility decisions, and draft Chapters do not cross that
+boundary.
 
 ## Artifact CLI
 
@@ -47,7 +42,7 @@ node bin/remixx-artifact.mjs help
 npm test
 ```
 
-The schemas under each skill's `references/schemas/` directory are the
+The schemas under the report skill's `references/schemas/` directory are the
 authoritative portable contracts.
 
 ## Canonical AI retrieval
