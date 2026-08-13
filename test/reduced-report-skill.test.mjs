@@ -3,12 +3,24 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const skill = await readFile(
+  new URL("../skills/remixx-show/SKILL.md", import.meta.url),
+  "utf8",
+);
+const legacySkill = await readFile(
   new URL("../skills/remixx-report/SKILL.md", import.meta.url),
   "utf8",
 );
 
-test("the report skill is a focused editorial adapter", () => {
-  assert.ok(skill.split("\n").length <= 180);
+test("the show skill is a focused editorial adapter", () => {
+  assert.ok(skill.split("\n").length <= 200);
+  assert.match(skill, /^name: remixx-show$/m);
+  assert.match(skill, /show what I built/i);
+  assert.match(skill, /video post/i);
+  assert.match(
+    skill,
+    /Use remixx\.org to show what I just built here as a video post\./,
+  );
+  assert.equal(legacySkill, skill);
   assert.equal(
     skill.match(/^npx[^\r\n]+/m)?.[0],
     'npx --yes remixx-cli@latest report context --intent "$INTENT" --workspace "$PWD" --json',

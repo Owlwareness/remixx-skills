@@ -1,0 +1,74 @@
+{
+  "$ref": "#/definitions/report-source-manifest.v1",
+  "definitions": {
+    "report-source-manifest.v1": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "report-source-manifest.v1"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "agent_session",
+                  "repository",
+                  "artifact",
+                  "tool_result",
+                  "founder_statement",
+                  "external"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "contentHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "capturedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "proposedVisibility": {
+                "type": "string",
+                "enum": ["public", "private"]
+              }
+            },
+            "required": [
+              "sourceId",
+              "kind",
+              "label",
+              "contentHash",
+              "locator",
+              "capturedAt",
+              "proposedVisibility"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 50
+        }
+      },
+      "required": ["schemaVersion", "entries"],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

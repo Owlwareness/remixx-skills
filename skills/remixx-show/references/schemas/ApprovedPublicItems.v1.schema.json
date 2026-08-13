@@ -1,0 +1,542 @@
+{
+  "$ref": "#/definitions/ApprovedPublicItems.v1",
+  "definitions": {
+    "ApprovedPublicItems.v1": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "ApprovedPublicItems.v1"
+        },
+        "artifactId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reportId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "project": {
+          "type": "object",
+          "properties": {
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "slug": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 80
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          },
+          "required": ["projectId", "slug", "name"],
+          "additionalProperties": false
+        },
+        "period": {
+          "type": "object",
+          "properties": {
+            "startedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "endedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": ["startedAt", "endedAt"],
+          "additionalProperties": false
+        },
+        "promiseContext": {
+          "type": "object",
+          "properties": {
+            "itemId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "statement": {
+              "type": "string",
+              "minLength": 5,
+              "maxLength": 1000
+            },
+            "sourceRefs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1,
+              "maxItems": 20
+            }
+          },
+          "required": ["itemId", "statement", "sourceRefs"],
+          "additionalProperties": false
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "movement"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "significance": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "summary",
+                  "significance"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "decision"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 2000
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "decision",
+                  "rationale"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "attempt"
+                  },
+                  "classification": {
+                    "type": "string",
+                    "enum": [
+                      "failed",
+                      "blocked",
+                      "deferred",
+                      "superseded",
+                      "inconclusive",
+                      "never_tried"
+                    ]
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "conditions": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "reopenTrigger": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 1000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "classification",
+                  "summary",
+                  "conditions",
+                  "reopenTrigger"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "surprise"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "learning": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "observation",
+                  "learning"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "belief_change"
+                  },
+                  "previous": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1500
+                  },
+                  "current": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1500
+                  },
+                  "confidence": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "previous",
+                  "current",
+                  "confidence"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "friction"
+                  },
+                  "tension": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "whyItMatters": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "tension",
+                  "whyItMatters"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "open_edge"
+                  },
+                  "question": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "nextExperiment": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 1500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "question",
+                  "nextExperiment"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "sourceRefs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "minItems": 1,
+                    "maxItems": 20
+                  },
+                  "kind": {
+                    "type": "string",
+                    "const": "candidate_assumption"
+                  },
+                  "statement": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  },
+                  "evidenceNeeded": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 1500
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "sourceRefs",
+                  "kind",
+                  "statement",
+                  "evidenceNeeded"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 200
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sourceId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "agent_session",
+                  "repository",
+                  "artifact",
+                  "tool_result",
+                  "founder_statement",
+                  "external"
+                ]
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "publicLocator": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "contentHash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "sourceId",
+              "kind",
+              "label",
+              "publicLocator",
+              "contentHash"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "approval": {
+          "type": "object",
+          "properties": {
+            "approvedBy": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "approvedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "visibilityDecisionHash": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": ["approvedBy", "approvedAt", "visibilityDecisionHash"],
+          "additionalProperties": false
+        },
+        "contentHash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "artifactId",
+        "reportId",
+        "project",
+        "period",
+        "promiseContext",
+        "items",
+        "sourceRefs",
+        "approval",
+        "contentHash"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

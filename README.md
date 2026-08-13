@@ -1,17 +1,18 @@
 # remixx skills
 
-Open, vendor-neutral rituals for turning real work into truthful public
-Chapters.
+Open, vendor-neutral skills for turning real local work into truthful,
+ready-to-post video posts.
 
-This repository contains one independent skill:
+The canonical public skill is:
 
-- [`remixx-report`](skills/remixx-report/SKILL.md) turns a bounded period of
-  real Project work into private memory and, after two human gates, an approved
-  public `chapter.v1`.
+- [`remixx-show`](skills/remixx-show/SKILL.md) turns work already present in a
+  local web project into a private video-post review. The creator alone decides
+  whether to press **Post**.
 
 Any capable AI can retrieve and follow the Markdown directly. Codex-compatible
-hosts may install the skill folder and invoke `$remixx-report`. Hosts with
-slash-command routing may expose `/report`.
+hosts may install the skill folder and invoke `$remixx-show`. The legacy
+[`remixx-report`](skills/remixx-report/SKILL.md) entry remains available for
+cached prompts and serves the same instructions.
 
 ## Trust boundary
 
@@ -42,20 +43,20 @@ node bin/remixx-artifact.mjs help
 npm test
 ```
 
-The schemas under the report skill's `references/schemas/` directory are the
+The schemas under the legacy protocol support directory's `references/schemas/` directory are the
 authoritative portable contracts.
 
 ## Canonical AI retrieval
 
-The public report skill is authored in this repository at
-[`skills/remixx-report/SKILL.md`](skills/remixx-report/SKILL.md). The Remixx application serves that source
+The public show skill is authored in this repository at
+[`skills/remixx-show/SKILL.md`](skills/remixx-show/SKILL.md). The Remixx application serves that source
 through the single stable discovery URL:
 
 ```text
-https://remixx-sepia.vercel.app/report
+https://remixx.org/show
 ```
 
-Give an AI that URL for report discovery. No authentication, clone, install, or existing Remixx directory is
+Give an AI that URL for show instructions. No authentication, clone, install, or existing Remixx directory is
 required to read it. The copy in the private application monorepo is a byte-identical deployment mirror; this
 public repository remains the source. The Remixx platform remains the authenticated review and publication
 surface. Before the first npm release, the source names `remixx-cli@latest`; the canonical endpoint resolves
