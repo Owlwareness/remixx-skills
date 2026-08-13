@@ -49,6 +49,86 @@ Write `remixx-report-request.v3`. It has `continuity`, never `project.projectId`
 - continuation: copy the latest context watermark exactly;
 - `newOutcome` states what is visibly possible now that the recent posts did not already demonstrate.
 
+### Copyable v3 request
+
+This complete shape is a first post. Change values, not keys. For a continuation, copy both
+`latestPublication` values into `continuity` and write its new visible outcome. Keep the opaque
+`resolutionToken` out of JSON; it is only an argument to `report create`.
+
+```json
+{
+  "schemaVersion": "remixx-report-request.v3",
+  "outcome": "ready_for_capture",
+  "continuity": {
+    "basePostId": null,
+    "basePublicationHash": null,
+    "newOutcome": "A maker can turn an empty board into a working route."
+  },
+  "story": {
+    "title": "Draw a route and watch the city respond",
+    "caption": "Connected stations turn the map into a network.",
+    "body": "The demo draws a route, adds stations, and shows the city responding.",
+    "narration": "Draw a route. Add stations. Watch the city respond."
+  },
+  "claims": [
+    {
+      "statement": "Connected stations make the city respond.",
+      "evidenceRefs": ["capture:network"]
+    }
+  ],
+  "capture": {
+    "target": { "kind": "localhost-web", "url": "http://127.0.0.1:3000" },
+    "viewport": { "width": 1280, "height": 720 },
+    "scenes": [
+      {
+        "sceneId": "empty_map",
+        "path": "/",
+        "readySelector": "[data-ready]",
+        "actions": [
+          {
+            "kind": "waitFor",
+            "selector": "[data-ready]",
+            "state": "visible",
+            "timeoutMs": 10000
+          },
+          { "kind": "hold", "durationMs": 800 }
+        ]
+      },
+      {
+        "sceneId": "route_drawn",
+        "continueFromPrevious": true,
+        "readySelector": "[data-route-drawn]",
+        "actions": [
+          { "kind": "click", "selector": "[data-draw-route]", "afterMs": 500 },
+          { "kind": "hold", "durationMs": 800 }
+        ]
+      },
+      {
+        "sceneId": "stations_added",
+        "continueFromPrevious": true,
+        "readySelector": "[data-stations-added]",
+        "actions": [
+          { "kind": "click", "selector": "[data-add-station]", "afterMs": 500 },
+          { "kind": "hold", "durationMs": 800 }
+        ]
+      }
+    ],
+    "cues": [],
+    "budget": { "maxDurationMs": 20000, "maxOutputBytes": 33554432 }
+  },
+  "privacy": {
+    "excludedPatterns": [],
+    "allowedEvidenceIds": ["capture:network"]
+  },
+  "presentation": {
+    "template": "product-demo-overlay-v1",
+    "narrationMode": "spoken-preferred",
+    "musicMode": "effects",
+    "captionMode": "word-synced"
+  }
+}
+```
+
 Use 3–5 accumulated observable states. Only the first state must navigate; later states continue from prior
 state unless they intentionally change route. End each decisive state with an 800ms hold. Use exactly one
 allowed evidence ID for the continuous screencast. Keep narration within 2.5 spoken words per second. Set

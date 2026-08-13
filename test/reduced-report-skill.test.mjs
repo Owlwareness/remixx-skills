@@ -7,8 +7,8 @@ const skill = await readFile(
   "utf8",
 );
 
-test("the report skill is a thin editorial adapter", () => {
-  assert.ok(skill.split("\n").length <= 100);
+test("the report skill is a focused editorial adapter", () => {
+  assert.ok(skill.split("\n").length <= 180);
   assert.equal(
     skill.match(/^npx[^\r\n]+/m)?.[0],
     'npx --yes remixx-cli@latest report context --intent "$INTENT" --workspace "$PWD" --json',
@@ -27,6 +27,7 @@ test("the report skill is a thin editorial adapter", () => {
   assert.doesNotMatch(skill, /npx --yes @remixx\/cli/);
   assert.match(skill, /Remixx client unavailable/);
   assert.match(skill, /remixx-report-request\.v3/);
+  assert.match(skill, /### Copyable v3 request/);
   assert.match(skill, /Never print a numeric menu/);
   assert.match(skill, /never `project\.projectId`/);
   assert.doesNotMatch(skill, /1 approve|2 edit|3 cancel/i);
