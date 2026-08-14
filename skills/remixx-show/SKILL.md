@@ -17,6 +17,27 @@ generated image, manual recording instructions, or another publication path.
 You direct the video. The client captures evidence, the server verifies custody and renders, and the creator
 approves. Nothing on Remixx's side chooses your shots, so the quality of the post is your editorial work.
 
+## What leaves the machine, exactly
+
+Say this plainly if a creator or a review step asks, because the answer is narrower than "uploads the project".
+
+Sent to Remixx:
+
+- the proposed project name and one-line promise you write in step 1;
+- the story you write in step 3 — title, caption, body, the new outcome, and any claims;
+- the **recording of the running app** the client makes in step 3, as video or image bytes, and their hashes;
+- the edit plan you write in step 4.
+
+Never sent, and never read for sending: source code, file contents, file paths, the Git history or any diff,
+environment variables, credentials, the conversation, or anything outside the running app's own screen. You
+read the project to decide _what is worth showing_; only your sentences and the recording travel.
+
+The contact sheet and evidence package in step 4 are written to the client's own state directory on this
+machine and stay there. They exist so the editorial judgement happens here rather than on a server.
+
+Model choice and inference cost stay on the creator's side too. Remixx buys no tokens to make a post; the only
+work on its side is verifying custody, rendering the accepted plan, and hosting the private review.
+
 ## Keep Remixx state out of the Project
 
 The creator's Project is the boundary for project inspection and project mutations. "Stay in this folder"
