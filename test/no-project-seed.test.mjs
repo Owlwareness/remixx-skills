@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
-import { artifactKinds } from "../lib/schemas.mjs";
 
 test("does not expose the retired project-seed workflow", async () => {
   await assert.rejects(
@@ -13,6 +12,16 @@ test("does not expose the retired project-seed workflow", async () => {
     "utf8",
   );
   assert.doesNotMatch(readme, /project-seed|start-project/i);
-  assert.equal(artifactKinds.includes("project-seed"), false);
-  assert.equal(artifactKinds.includes("project"), false);
+});
+
+test("carries no tooling a reader has no reason to open", async () => {
+  // This repository publishes instructions, not a program. Anything a stranger
+  // would not open on purpose belongs somewhere else.
+  for (const retired of ["../bin", "../lib", "../schemas"]) {
+    await assert.rejects(
+      access(new URL(retired, import.meta.url)),
+      undefined,
+      retired,
+    );
+  }
 });

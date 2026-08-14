@@ -34,22 +34,15 @@ source hashes, and the publication destination are resolved by the server and
 never appear in anything the AI writes. Pressing **Post** is the creator's,
 inside an authenticated session this skill has no part in.
 
-## Artifact CLI
+## What you need
 
-The included CLI supplies deterministic schema validation, canonical hashes,
-public-subset construction, approval transitions, and leak-resistant Chapter
-export, plus a bounded approved-Chapter staging handoff. It does not call a
-model: the active AI host performs the reasoning, while the CLI protects the
-artifact boundaries.
+The AI needs terminal access and a project running on localhost. The published
+client handles the rest, and prints the exact command to run if a dependency is
+missing.
 
-```sh
-npm install
-node bin/remixx-artifact.mjs help
-npm test
-```
-
-Its portable contracts live in [`schemas/`](schemas/). They are separate from the
-skill above, which needs no schema files to follow.
+- Node 20 or newer
+- Chromium, via `npx playwright install chromium`
+- a browser on the same machine, once, to sign in
 
 ## Canonical AI retrieval
 
