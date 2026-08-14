@@ -1,174 +1,137 @@
 ---
 name: remixx-show
-description: Show work already built in the current local web project as a private, ready-to-post video post. Use when the creator says "show what I built", asks for a "video post", says "Use remixx.org to show what I just built here as a video post.", requests an edit to the current private review, or has a legacy /report prompt.
+description: Show work already built in the current local web project as a private, ready-to-post video post. Use when the creator says "show what I built", asks for a "video post", says "Use remixx.org to show what I just built here as a video post.", or requests an edit to the current private review.
 ---
 
 # Show what you built
 
 > **Use remixx.org to show what I just built here as a video post.**
 
-Use this skill to prepare a truthful video post about work already present in the current local web project.
-Do not add features merely to create something to post, and do not publish anything: the creator reviews the
-private result and is the only person who can press **Post**.
+Prepare a truthful video post about work already present in the current local web project. Do not add features
+merely to have something to post, and do not publish: the creator reviews the private result and is the only
+person who can press **Post**.
 
-If there is no safe, visibly demonstrable outcome, stop honestly. Do not substitute a markdown report,
+If there is no safe, visibly demonstrable outcome, stop honestly. Do not substitute a markdown report, a
 generated image, manual recording instructions, or another publication path.
 
-## Start the compatible client flow
+You direct the video. The client captures evidence, the server verifies custody and renders, and the creator
+approves. Nothing on Remixx's side chooses your shots, so the quality of the post is your editorial work.
 
-The current published client uses `report` only as a compatibility protocol command. Run its exact commands
-below; the creator's action and the artifact remain **show** and **video post**.
+## Keep Remixx state out of the Project
+
+The creator's Project is the boundary for project inspection and project mutations. "Stay in this folder"
+means stay scoped to that Project; it does not move Remixx's capture, request, or credential machinery into
+it. The client owns that machinery in its own OS application-state area.
+
+Never create `.remixx-session`, evidence, intent, request, or proposal JSON, credentials, resolution tokens,
+or receipts inside the Project. Never edit the Project's `.gitignore` to hide Remixx state. Pass documents on
+standard input and keep returned IDs opaque rather than managing paths.
+
+If the creator forbids **all** filesystem writes outside the folder, Remixx cannot satisfy both constraints:
+say so and stop before capture. Do not silently write either inside the Project or outside it.
+
+## 1. Resolve the destination
 
 ```sh
-npx --yes remixx-cli@latest report context --intent "$INTENT" --workspace "$PWD" --json
+npx --yes remixx-cli@latest report context --intent-stdin --workspace "$PWD" --json <<'REMIXX_INTENT'
+<the remixx-project-intent.v1 JSON document>
+REMIXX_INTENT
 ```
 
-This context handshake is always first. Infer a proposed Project name and one-line public promise from the
-current Project and write `remixx-project-intent.v1` in a fresh OS temporary directory. The intent may contain
-a canonical `https://remixx.org/p/<slug>` URL only when the creator supplied it in the current conversation.
-It never contains a Project ID, filesystem path, Git diff, credential, or model-minted receipt.
+Always first. Infer a proposed Project name and a one-line public promise from the current Project. The intent
+may contain a canonical `https://remixx.org/p/<slug>` URL only when the creator supplied it in this
+conversation. It never contains a Project ID, filesystem path, Git diff, credential, or minted receipt.
 
-The server response is authoritative:
+The response is authoritative:
 
-- `mode: existing` means continue that exact owned Project. Use `recentPosts` to understand what its audience
-  has already seen and make this post about only the new visible progress.
-- `mode: new` means this is a first post. Briefly show the proposed name, slug, and promise. Use the host's
-  native picker when it has one; otherwise ask one compact question accepting **Continue**, **Edit**, or
-  **Cancel**. Continue is the recommended default. Never print a numeric menu.
-- `mode: ambiguous` means ask the creator to choose among the returned named Project links. Never silently
-  choose a similar Project.
+- `mode: existing` — continue that owned Project. Use `recentPosts` to see what its audience already watched.
+- `mode: new` — a first post. Show the proposed name, slug, and promise. Use the host's native picker if it
+  has one, otherwise ask one compact question accepting **Continue**, **Edit**, or **Cancel**, with Continue
+  as the default. Never print a numeric menu.
+- `mode: ambiguous` — ask the creator to choose among the returned named Project links. Never pick a
+  similar-looking Project yourself.
 
-The context call creates neither a Project nor a private run. Keep its opaque `resolutionToken` in the OS
-temporary directory for the create command. Do not decode, edit, log, or place it in the creator's repo.
+This creates neither a Project nor a run. Keep the opaque `resolutionToken` as an argument for step 5 only.
+Do not decode, edit, log, or write it into the repo.
 
-## Choose the new progress
+## 2. Choose what is newly true
 
-1. Inspect only this Project's `git log`, committed diff, working-tree diff, and runnable localhost app. The
-   diff is the spine of truth. Use the current transcript only when the host already provides it; never search
-   for or reconstruct sessions.
+1. Inspect this Project's `git log`, committed and working-tree diffs, and the runnable localhost app. The
+   diff is the spine of truth. Use the current transcript only if the host already provides it.
 2. List outcomes that now work and did not before. Drop config, lint, dependency, refactor, and test churn
-   unless browser-visible behavior changed.
-3. Compare candidates with every returned `recentPosts` title, caption, and outcome. A later phase must show
-   the delta since the latest publication—not retell the first post with a new caption.
-4. Rank demonstrability first and importance second. Prefer an outcome localhost can show through clicks in
-   under 20 seconds. Reject activity titles; require one outcome sentence.
-5. Select the strongest non-repeating subject yourself. Do not ask the creator to approve routine editorial
-   choices. If nothing genuinely new is visible, return `no_visible_change` with the concrete reason.
+   unless browser-visible behaviour changed.
+3. Compare candidates against every returned `recentPosts` entry. A later post shows the delta since the last
+   publication; it does not retell the first post with a new caption.
+4. Rank by demonstrability first, importance second. Prefer something localhost can show in a few seconds.
+5. Choose it yourself. Do not ask the creator to approve routine editorial choices. If nothing genuinely new
+   is visible, return `no_visible_change` with the concrete reason.
 
-## Capture and create
+One externally legible change, shown clearly. Not a progress montage.
 
-Write `remixx-report-request.v3`. It has `continuity`, never `project.projectId`:
+## 3. Capture the evidence
 
-- first post: `basePostId` and `basePublicationHash` are `null`;
-- continuation: copy the latest context watermark exactly;
-- `newOutcome` states what is visibly possible now that the recent posts did not already demonstrate.
+Send a `remixx-report-request.v4` document on standard input. It carries `continuity`, never a project ID:
 
-### Copyable v3 request
+- first post — `basePostId` and `basePublicationHash` are `null`;
+- continuation — copy the context watermark exactly;
+- `newOutcome` — what is visibly possible now that the recent posts did not already show.
 
-This complete shape is a first post. Change values, not keys. For a continuation, copy both
-`latestPublication` values into `continuity` and write its new visible outcome. Keep the opaque
-`resolutionToken` out of JSON; it is only an argument to `report create`.
-
-```json
-{
-  "schemaVersion": "remixx-report-request.v3",
-  "outcome": "ready_for_capture",
-  "continuity": {
-    "basePostId": null,
-    "basePublicationHash": null,
-    "newOutcome": "A maker can turn an empty board into a working route."
-  },
-  "story": {
-    "title": "Draw a route and watch the city respond",
-    "caption": "Connected stations turn the map into a network.",
-    "body": "The demo draws a route, adds stations, and shows the city responding.",
-    "narration": "Draw a route. Add stations. Watch the city respond."
-  },
-  "claims": [
-    {
-      "statement": "Connected stations make the city respond.",
-      "evidenceRefs": ["capture:network"]
-    }
-  ],
-  "capture": {
-    "target": { "kind": "localhost-web", "url": "http://127.0.0.1:3000" },
-    "viewport": { "width": 1280, "height": 720 },
-    "scenes": [
-      {
-        "sceneId": "empty_map",
-        "path": "/",
-        "readySelector": "[data-ready]",
-        "actions": [
-          {
-            "kind": "waitFor",
-            "selector": "[data-ready]",
-            "state": "visible",
-            "timeoutMs": 10000
-          },
-          { "kind": "hold", "durationMs": 800 }
-        ]
-      },
-      {
-        "sceneId": "route_drawn",
-        "continueFromPrevious": true,
-        "readySelector": "[data-route-drawn]",
-        "actions": [
-          { "kind": "click", "selector": "[data-draw-route]", "afterMs": 500 },
-          { "kind": "hold", "durationMs": 800 }
-        ]
-      },
-      {
-        "sceneId": "stations_added",
-        "continueFromPrevious": true,
-        "readySelector": "[data-stations-added]",
-        "actions": [
-          { "kind": "click", "selector": "[data-add-station]", "afterMs": 500 },
-          { "kind": "hold", "durationMs": 800 }
-        ]
-      }
-    ],
-    "cues": [],
-    "budget": { "maxDurationMs": 20000, "maxOutputBytes": 33554432 }
-  },
-  "privacy": {
-    "excludedPatterns": [],
-    "allowedEvidenceIds": ["capture:network"]
-  },
-  "presentation": {
-    "template": "product-demo-overlay-v1",
-    "narrationMode": "spoken-preferred",
-    "musicMode": "effects",
-    "captionMode": "word-synced"
-  }
-}
-```
-
-Use 3–5 accumulated observable states. Only the first state must navigate; later states continue from prior
-state unless they intentionally change route. End each decisive state with an 800ms hold. Use exactly one
-allowed evidence ID for the continuous screencast. Keep narration within 2.5 spoken words per second. Set
-`product-demo-overlay-v1`, `effects`, and `word-synced` presentation values. Exclude secrets, personal data,
-private logs, absolute paths, and uncertain claims.
-
-The client—not the agent—executes Playwright, draws interactions, probes the resulting bytes, and writes the
-evidence manifest:
+`presentation` is `{ "template": "proof-of-change-v1", "narrationMode": "none" }`. Posts are currently silent,
+so omit narration text. Use one to five scenes; only the first needs a `path`, and later scenes either
+navigate or set `continueFromPrevious`. Exclude secrets, personal data, private logs, absolute paths, and
+claims you cannot show.
 
 ```sh
-npx --yes remixx-cli@latest report capture --request "$REQUEST" --output-dir "$EVIDENCE" --json
+npx --yes remixx-cli@latest report capture --request-stdin --json <<'REMIXX_REQUEST'
+<the complete remixx-report-request.v4 JSON document>
+REMIXX_REQUEST
 ```
 
-Then create the resolved draft:
+The client runs the browser, performs the interactions, records what happened, and privately writes the
+evidence. The result is an opaque `captureId`. Keep it opaque.
+
+## 4. Direct the edit
 
 ```sh
-npx --yes remixx-cli@latest report create --request "$REQUEST" --resolution-token "$RESOLUTION" --workspace "$PWD" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json
+npx --yes remixx-cli@latest report direct --capture-id "$CAPTURE_ID" --json
 ```
 
-Use only `remixx-cli@latest`. Never substitute a global install, cached package, repository script, local
-Remixx source, credentials, another dev folder, an old transcript, or a Project ID found on disk. If the
-package is unavailable, stop with `Remixx client unavailable` rather than building a workaround.
+This writes a private evidence package and a contact sheet image, and returns their paths. **Read both.** The
+package contains the exact instructions for a `remixx-director-proposal.v1`, the de-identified evidence
+catalog addressed by opaque `evidence_*` handles, the recorded event log with the timing and geometry of what
+the capture actually did, and the labelled frames in the sheet. Open the contact sheet image and look at it.
+
+Use the event log to decide where the proof is, and the frames to decide whether it reads. Geometry tells you
+where something happened; only the pixels tell you whether a viewer can see it.
+
+Then write the proposal and submit it:
+
+```sh
+npx --yes remixx-cli@latest report direct --capture-id "$CAPTURE_ID" --proposal-stdin --json <<'REMIXX_PLAN'
+<the complete remixx-director-proposal.v1 JSON document>
+REMIXX_PLAN
+```
+
+Refer only to `evidence_*` handles. Never emit a source hash, project ID, post ID, review ID, destination, or
+provider metadata; those are server-owned and a proposal containing one is rejected.
+
+If the server rejects the plan it returns exact codes and JSON paths. Change the edit to address them rather
+than patching fields mechanically, and submit a different proposal. Some findings come back as review notes
+instead: the post still renders and the creator judges them.
+
+## 5. Create the private review
+
+```sh
+npx --yes remixx-cli@latest report create --capture-id "$CAPTURE_ID" --resolution-token "$RESOLUTION" --workspace "$PWD" --idempotency-key "$KEY" --wait --json
+```
+
+Use only `remixx-cli@latest`. Never substitute a global install, a cached package, a repository script, local
+Remixx source, credentials, another folder, an old transcript, or a Project ID found on disk. If the package
+is unavailable, stop with `Remixx client unavailable` rather than building a workaround.
 
 If stdout returns `authentication_required`, run `npx --yes remixx-cli@latest login --json`, complete the
-browser connection, and retry the identical command and idempotency key. Read stdout only as versioned JSON;
-human-readable progress is on stderr.
+browser connection, and retry the identical command with the same idempotency key. Read stdout only as
+versioned JSON; human-readable progress goes to stderr.
 
 On success, return only:
 
@@ -176,18 +139,19 @@ On success, return only:
 >
 > Want changes? Tell me here. If it looks good, press **Post to _Project name_** there.
 
-The review may be a new-Project draft even though no Project exists yet. Pressing **Post** is the sole
-authority that atomically creates that Project and publishes its first post. Never publish from the agent.
+The review may be a draft for a Project that does not exist yet. Pressing **Post** is the sole authority that
+creates it and publishes the first post. Never publish from the agent.
 
 ## Edits
 
-Translate ordinary-language feedback into `remixx-report-revision-request.v2`, inherit unchanged evidence by
-hash, capture only when visible evidence changes, and invoke:
+Translate feedback into a `remixx-report-revision-request.v3`, inherit unchanged evidence by hash, and capture
+again only when the visible evidence itself must change. Direct the new edit exactly as in step 4 — a revision
+needs its own proposal — then:
 
 ```sh
-npx --yes remixx-cli@latest report revise --request "$REQUEST" --evidence-root "$EVIDENCE" --idempotency-key "$KEY" --wait --json
+npx --yes remixx-cli@latest report revise --capture-id "$CAPTURE_ID" --idempotency-key "$KEY" --wait --json
 ```
 
-Revision custody comes from the Run. Never resolve or accept a different Project destination during revise.
-Return the same review URL when ready. On error, report the stable `code` and concise `message`; do not
-improvise a fallback pipeline.
+Custody comes from the run. Never resolve or accept a different Project during a revision. Return the same
+review URL when ready. On error, report the stable `code` and its concise `message`; do not improvise a
+fallback pipeline.

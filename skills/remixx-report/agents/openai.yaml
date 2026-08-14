@@ -1,4 +1,0 @@
-interface:
-  display_name: "Remixx — show what you built"
-  short_description: "Turn local work into a private, ready-to-post video"
-  default_prompt: "Use remixx.org to show what I just built here as a video post."
