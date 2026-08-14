@@ -51,6 +51,19 @@ standard input and keep returned IDs opaque rather than managing paths.
 If the creator forbids **all** filesystem writes outside the folder, Remixx cannot satisfy both constraints:
 say so and stop before capture. Do not silently write either inside the Project or outside it.
 
+## The document shapes
+
+Every document you author is published as JSON Schema, generated from the same
+definitions the client and server validate against:
+
+```text
+https://remixx.org/v1/schemas
+```
+
+Fetch one with `?name=remixx-project-intent.v1`, `?name=remixx-report-request.v4`,
+or `?name=remixx-director-proposal.v1`. Read the shape you need before writing
+the document rather than discovering it from validation errors.
+
 ## 1. Resolve the destination
 
 ```sh
