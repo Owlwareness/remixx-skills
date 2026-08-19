@@ -96,11 +96,32 @@ Do not decode, edit, log, or write it into the repo.
    unless browser-visible behaviour changed.
 3. Compare candidates against every returned `recentPosts` entry. A later post shows the delta since the last
    publication; it does not retell the first post with a new caption.
-4. Rank by demonstrability first, importance second. Prefer something localhost can show in a few seconds.
+4. Rank by **visual dominance** first, importance second — how much of a phone screen visibly becomes
+   something else. A payoff that fills the frame beats a truer one that changes a badge in a corner.
 5. Choose it yourself. Do not ask the creator to approve routine editorial choices. If nothing genuinely new
    is visible, return `no_visible_change` with the concrete reason.
 
+**Choose the capability worth watching, not the work completed.** "Wired up OAuth" is the work. "The app now
+runs on a real live stream" is the capability. Same commit, and only one of them is worth a stranger's two
+seconds. Name the payoff a viewer would care about, then find the evidence for it.
+
+A payoff may be **static**. Optimize for visual dominance and comprehensibility, not for how much motion is
+in the frame. Never manufacture product behaviour to have something to record.
+
 One externally legible change, shown clearly. Not a progress montage.
+
+### Say what you are about to show
+
+Before capturing, tell the creator in **one sentence** what you intend to show, and continue unless they
+redirect you:
+
+> The strongest thing to show is the app connecting to a real live stream and receiving data. I'll lead with
+> the connected result. Anything you definitely want in?
+
+This is not asking permission — do not print a beat list, a shot table, or a plan for approval, and do not
+wait when the answer is obvious ("The magic is the grid rerouting when a feeder is cut. I'm making that the
+post."). It exists because the creator knows which change is the magic and you can only see which changed.
+One sentence of theirs before capture is worth more than any correction afterwards.
 
 ## 3. Capture the evidence
 
@@ -114,6 +135,16 @@ Send a `remixx-report-request.v4` document on standard input. It carries `contin
 so omit narration text. Use one to five scenes; only the first needs a `path`, and later scenes either
 navigate or set `continueFromPrevious`. Exclude secrets, personal data, private logs, absolute paths, and
 claims you cannot show.
+
+**Stage the app one action before the payoff happens.** Put it in the state where the interesting thing is
+about to occur, capture the trigger and the settled result, and hold long enough for a stranger to
+understand what changed. Do not record the route you took to get there: a chronological tutorial spends the
+only seconds you have on setup. There is no minimum number of scenes, and context worth showing is recorded
+as its own scene rather than folded into the payoff.
+
+Some payoffs cannot be captured at all. Anything that navigates away from the creator's localhost app — a
+third-party sign-in, a payment page, an external console — is outside what this records, and its credentials
+must never be filmed. Capture the *result* on localhost and leave the offscreen step to be explained.
 
 ```sh
 npx --yes remixx-cli@latest report capture --request-stdin --json <<'REMIXX_REQUEST'
@@ -137,6 +168,28 @@ the capture actually did, and the labelled frames in the sheet. Open the contact
 
 Use the event log to decide where the proof is, and the frames to decide whether it reads. Geometry tells you
 where something happened; only the pixels tell you whether a viewer can see it.
+
+### Lead with the payoff
+
+Open on the strongest authentic moment, already happening. Do not build up to it, and do not open on the app
+sitting in its start state — the first two seconds decide whether anyone sees the rest. Explanation follows
+the proof; it never precedes it. End when the proof is understood: there is no required outro, closing
+context shot, limitation, or invitation to respond.
+
+Selected source ranges must move forward and may not replay a frame, so the video cannot return to an
+earlier moment. If you want to end back on the result, take a **later, non-overlapping** slice of the same
+held result rather than reusing the frames you opened with.
+
+### Check the hero at phone size before you commit to it
+
+Look at the chosen frames at the size the post is actually watched — a phone, not your screen. **A viewer
+must be able to find the payoff within two seconds without reading any text.** If the interesting region is a
+thin line, a small badge, a few pixels of colour, or text too small to resolve, the edit cannot save it.
+
+If it does not read, make **one** bounded repair — a better starting state, a tighter viewport, different
+framing, or a different candidate entirely — and look again. If it still does not read, return
+`no_visible_change` and say concretely what was too small to see. Shipping an unreadable post costs more
+than shipping nothing.
 
 Then write the proposal and submit it:
 
