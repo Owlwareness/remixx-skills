@@ -146,6 +146,15 @@ Some payoffs cannot be captured at all. Anything that navigates away from the cr
 third-party sign-in, a payment page, an external console — is outside what this records, and its credentials
 must never be filmed. Capture the *result* on localhost and leave the offscreen step to be explained.
 
+Two mistakes are expensive to discover afterwards:
+
+- **Let the result stay on screen after the action.** A click that is cut away from immediately proves
+  nothing, and the eye needs a moment to register what changed.
+- **Do not reload the page between scenes unless the reload is itself the point.** Whatever the app has
+  built up — a drawing, a cart, a filtered list, a session, a log — is gone after a reload. A capture
+  organised as one page load per talking point throws away the proof it just created. Plan a single run
+  through the app and let it accumulate. This has already produced a finished video whose canvas was blank.
+
 ```sh
 npx --yes remixx-cli@latest report capture --request-stdin --json <<'REMIXX_REQUEST'
 <the complete remixx-report-request.v4 JSON document>
