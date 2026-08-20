@@ -1,0 +1,12 @@
+{
+  "name": "remixx-show",
+  "description": "Show work already built in the current local web project as a private, ready-to-post video post. The creator alone decides whether to press Post.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Owlwareness",
+    "url": "https://remixx.org"
+  },
+  "homepage": "https://remixx.org/show.md",
+  "repository": "https://github.com/Owlwareness/remixx-skills",
+  "license": "MIT"
+}

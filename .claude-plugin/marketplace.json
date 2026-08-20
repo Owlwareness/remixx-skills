@@ -1,0 +1,33 @@
+{
+  "name": "remixx",
+  "owner": {
+    "name": "Owlwareness",
+    "url": "https://remixx.org"
+  },
+  "metadata": {
+    "description": "The open, vendor-neutral skill for turning local work into a private, ready-to-post Remixx video.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "remixx-show",
+      "source": "./",
+      "description": "Show work already built in the current local web project as a private, ready-to-post video post. The creator alone decides whether to press Post.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Owlwareness",
+        "url": "https://remixx.org"
+      },
+      "homepage": "https://remixx.org/show.md",
+      "repository": "https://github.com/Owlwareness/remixx-skills",
+      "license": "MIT",
+      "keywords": [
+        "remixx",
+        "video",
+        "post",
+        "screencast",
+        "building-in-public"
+      ]
+    }
+  ]
+}

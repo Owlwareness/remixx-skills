@@ -12,6 +12,25 @@ There is one skill:
 Any capable AI can retrieve and follow the Markdown directly. Codex-compatible
 hosts may install the skill folder and invoke `$remixx-show`.
 
+## Install
+
+**Claude Code**
+
+```text
+/plugin marketplace add Owlwareness/remixx-skills
+/plugin install remixx-show@remixx
+```
+
+**Anything else** — read the instructions as raw text:
+
+```sh
+curl -sL https://remixx.org/show.md
+```
+
+Read it raw rather than through a summarising fetch tool. The instructions carry
+exact command flags, JSON Schema names, and a list of what may and may not leave
+the machine, and a summary drops them.
+
 ## The flow
 
 ```text

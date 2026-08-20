@@ -1,6 +1,6 @@
 ---
 name: remixx-show
-description: Show work already built in the current local web project as a private, ready-to-post video post. Use when the creator says "show what I built", asks for a "video post", says "Use remixx.org to show what I just built here as a video post.", or requests an edit to the current private review.
+description: Turn work already built in the current local web project into a private, ready-to-post video post. Use when the creator mentions Remixx or the Remixx skill, says "show what I built", asks to "make a post" or "post about" a feature, asks for a video post or screencast of local work, names what to capture in the running app, or requests an edit to the current private review.
 ---
 
 # Show what you built
