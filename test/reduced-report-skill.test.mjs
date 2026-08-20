@@ -49,7 +49,9 @@ test("the skill teaches the current five-step flow in order", () => {
 
 test("the skill names only shipping contract versions", () => {
   assert.match(skill, /remixx-report-request\.v4/);
-  assert.match(skill, /remixx-director-proposal\.v1/);
+  assert.match(skill, /remixx-director-proposal\.v2/);
+  assert.match(skill, /authored-slide/);
+  assert.match(skill, /active director contract/);
   assert.match(skill, /remixx-report-revision-request\.v3/);
   assert.match(skill, /proof-of-change-v1/);
 
@@ -59,6 +61,7 @@ test("the skill names only shipping contract versions", () => {
     "remixx-report-request.v1",
     "remixx-report-request.v2",
     "remixx-report-request.v3",
+    "remixx-director-proposal.v1",
     "remixx-report-revision-request.v1",
     "remixx-report-revision-request.v2",
     "product-demo-overlay-v1",
