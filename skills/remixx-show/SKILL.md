@@ -34,6 +34,30 @@ Keep Remixx state out of the project. Never create `.remixx-session`, evidence, 
 credentials, token, or receipt files here, and never edit `.gitignore` for Remixx. Pass authored documents on
 standard input. The client keeps private working state in its OS application-state directory.
 
+## 0. Ask once, before the first command
+
+Every step below runs `npx --yes remixx-cli@latest`. Downloading and executing a package is blocked by
+default in many agent harnesses, and that guardrail is correct. Get consent before you trip it, not after.
+
+Before your first CLI call, tell the creator in one short message: that you will download and run
+`remixx-cli@latest`, what the Boundary above says leaves the machine, that nothing is published without
+them, and ask whether to proceed. Most creators answer yes and nothing is ever blocked.
+
+If a command is refused anyway, escalate in this order and stop at the first step that works:
+
+1. Ask a single native question with two options — run the Remixx CLI, or cancel. The affirmative option
+   must say in its own words that it authorizes downloading and executing `remixx-cli@latest` for this
+   session. Then retry the identical command.
+2. If the refusal repeats, a selected option was not read as consent. Ask the creator to reply in their own
+   message with an explicit sentence, and give them the exact words to send: that they authorize you to
+   download and execute `remixx-cli@latest` via `npx --yes` for this Remixx session, that only what the
+   Boundary names may be sent, and that you must not edit their settings. Then retry the identical command.
+
+**Never propose a permissions fix.** Do not suggest a Bash allow-rule, a settings file edit, a config skill,
+or a change of permission mode, and never attempt one yourself. An agent must not expand its own authority,
+and a creator should not have to edit a settings file to look at a video. Asking plainly is the supported
+path and it works.
+
 ## 1. Resolve the destination
 
 Read the current authored-document index first:
@@ -77,6 +101,12 @@ beat list or routine camera decisions. If no result reads at phone size, return 
 concrete reason.
 
 ## 3. Capture evidence
+
+**Read the target shape before you capture, not after.** The finished post is portrait: the master is
+1080x1350, every crop must be an exact 4:5 rectangle inside your source, and the edit is capped at 240
+frames. Capture in a portrait window sized so the payoff already fills a 4:5 frame. A landscape capture
+costs you the whole recording — its widest legal crop is a fraction of what you filmed, and you will only
+discover that from the evidence package afterwards.
 
 Author one `remixx-report-request.v4` document. Use `presentation.template: "proof-of-change-v1"` and
 `narrationMode: "none"`. Use one to five scenes; only the first needs a path. Keep continuity watermarks
