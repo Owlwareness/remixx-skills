@@ -59,7 +59,9 @@ or receipt. The response is authoritative:
   question only when the host has no native picker. Continue is the default. Never print a numeric menu.
 - `mode: ambiguous`: ask the creator to choose among the returned named links. Never guess.
 
-Keep the opaque `resolutionToken` for step 5. Do not decode, edit, log, or save it in the project.
+Keep the returned continuity facts for the capture request, but do not rely on this early opaque
+`resolutionToken` for step 5. It is short-lived and consumed by create; do not decode, edit, log, or save it
+in the project. Refresh context with the same intent immediately before create to obtain the token you use.
 
 ## 2. Choose one newly true thing
 
@@ -124,9 +126,20 @@ REMIXX_PLAN
 ```
 
 If rejected, address every exact code and JSON path with a genuinely different proposal. Do not patch fields
-mechanically or repeat a rejected edit.
+mechanically or repeat a rejected edit. An accepted proposal can still return non-blocking advisory findings;
+those are a reason to correct the proposal, not a publication block.
 
 ## 5. Create the private review
+
+Refresh context now, with the same `remixx-project-intent.v1` document and workspace from step 1. Use the
+fresh response's `resolutionToken`; this spends its short TTL on the create mutation rather than the thinking
+and directing steps. It does not re-record or alter the retained evidence.
+
+```sh
+npx --yes remixx-cli@latest report context --intent-stdin --workspace "$PWD" --json <<'REMIXX_INTENT'
+<the same remixx-project-intent.v1 JSON document from step 1>
+REMIXX_INTENT
+```
 
 ```sh
 npx --yes remixx-cli@latest report create --capture-id "$CAPTURE_ID" --resolution-token "$RESOLUTION" --workspace "$PWD" --idempotency-key "$KEY" --wait --json
@@ -151,12 +164,17 @@ reviewed artifact set.
 
 ## Edits
 
-Translate feedback into a `remixx-report-revision-request.v3`; inherit unchanged evidence by hash and capture
-again only when visible evidence must change. Direct the successor edit again, then run:
+Any saved creator-side verifier outcome opens a successor: a rejection, or an accepted result with advisory
+findings. Translate the correction into a `remixx-report-revision-request.v3`; inherit unchanged evidence by
+hash and capture again only when visible evidence must change. Direct the successor edit again, then run:
 
 ```sh
 npx --yes remixx-cli@latest report revise --capture-id "$CAPTURE_ID" --idempotency-key "$KEY" --wait --json
 ```
 
-Revision custody comes from the existing run and cannot be redirected. Return the same review URL. On error,
-report the stable code and concise message; do not invent a fallback pipeline.
+Revision custody comes from the existing run and cannot be redirected. Return the same review URL. A retryable
+`render_failed` may be retried with the identical command only while `proposalHash` is unchanged. If the
+proposal needs correction, store it with `report direct`, then use `report revise` with a fresh idempotency
+key; do not create a new run with the old resolution token. If a genuinely new run is needed, re-run `report
+context` for a fresh token and use a new key. On error, report the stable code and concise message; do not
+invent a fallback pipeline.
