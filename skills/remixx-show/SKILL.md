@@ -39,15 +39,18 @@ standard input. The client keeps private working state in its OS application-sta
 Every step below runs `npx --yes remixx-cli@latest`, and downloading and executing a package is blocked by
 default in many agent harnesses. That guardrail is right. Get consent before you trip it rather than after.
 
-Give the creator a short heads-up in your own words before the first call: what you are about to run, that
-only what the Boundary names leaves the machine, that they will see a private review and press Post
-themselves, and ask whether that is okay. Ask it the way you would ask anything else. If your harness offers
-a native question with options, use it — the same way you would confirm a new project's name and promise.
+Give the creator a short heads-up in your own words before the first call, and **end your turn so they can
+reply in their own message**. Name the package you will download and run, say that only what the Boundary
+names leaves the machine, say they will see a private review and press Post themselves, and ask whether
+that is okay.
 
-If the command is refused anyway, the refusal is about the download, not about you. Offer the two choices
-plainly — run the client, or stop — and retry the identical command on a yes. If it is refused a second
-time, a selected option was not read as consent: ask the creator to reply in their own message authorizing
-you to download and run `remixx-cli@latest` for this session, then retry.
+Ask this one in conversation rather than through a clickable picker. A picker is right for a product
+decision — confirming a project's name and promise — but consent to download and execute is the creator's
+own words, and a typed reply is what reliably carries.
+
+If the command is refused anyway, the refusal is about the download, not about you. Say plainly what was
+blocked and ask again in the same way. Do not stack up repeated attempts; a creator can also retry a
+specific blocked command from their permissions view.
 
 Ask plainly rather than proposing a settings change. Nobody should have to edit a permissions file to look
 at a video, and an agent should not be the one expanding its own authority.
