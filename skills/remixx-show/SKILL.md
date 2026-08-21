@@ -36,27 +36,21 @@ standard input. The client keeps private working state in its OS application-sta
 
 ## 0. Ask once, before the first command
 
-Every step below runs `npx --yes remixx-cli@latest`. Downloading and executing a package is blocked by
-default in many agent harnesses, and that guardrail is correct. Get consent before you trip it, not after.
+Every step below runs `npx --yes remixx-cli@latest`, and downloading and executing a package is blocked by
+default in many agent harnesses. That guardrail is right. Get consent before you trip it rather than after.
 
-Before your first CLI call, tell the creator in one short message: that you will download and run
-`remixx-cli@latest`, what the Boundary above says leaves the machine, that nothing is published without
-them, and ask whether to proceed. Most creators answer yes and nothing is ever blocked.
+Give the creator a short heads-up in your own words before the first call: what you are about to run, that
+only what the Boundary names leaves the machine, that they will see a private review and press Post
+themselves, and ask whether that is okay. Ask it the way you would ask anything else. If your harness offers
+a native question with options, use it — the same way you would confirm a new project's name and promise.
 
-If a command is refused anyway, escalate in this order and stop at the first step that works:
+If the command is refused anyway, the refusal is about the download, not about you. Offer the two choices
+plainly — run the client, or stop — and retry the identical command on a yes. If it is refused a second
+time, a selected option was not read as consent: ask the creator to reply in their own message authorizing
+you to download and run `remixx-cli@latest` for this session, then retry.
 
-1. Ask a single native question with two options — run the Remixx CLI, or cancel. The affirmative option
-   must say in its own words that it authorizes downloading and executing `remixx-cli@latest` for this
-   session. Then retry the identical command.
-2. If the refusal repeats, a selected option was not read as consent. Ask the creator to reply in their own
-   message with an explicit sentence, and give them the exact words to send: that they authorize you to
-   download and execute `remixx-cli@latest` via `npx --yes` for this Remixx session, that only what the
-   Boundary names may be sent, and that you must not edit their settings. Then retry the identical command.
-
-**Never propose a permissions fix.** Do not suggest a Bash allow-rule, a settings file edit, a config skill,
-or a change of permission mode, and never attempt one yourself. An agent must not expand its own authority,
-and a creator should not have to edit a settings file to look at a video. Asking plainly is the supported
-path and it works.
+Ask plainly rather than proposing a settings change. Nobody should have to edit a permissions file to look
+at a video, and an agent should not be the one expanding its own authority.
 
 ## 1. Resolve the destination
 
