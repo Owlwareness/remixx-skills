@@ -114,7 +114,14 @@ After the hero, use one to five presentation cards when explanation adds value. 
 to one distinct full-frame `authored-slide` segment in the same order. Write semantic HTML fragments with
 inline styles only—no scripts, stylesheets, SVG, canvas, links, forms, remote resources, data URLs, or
 images. The client sanitizes each fragment, records the exact cleaned bytes and SHA-256, and stores only that
-canonical proposal. Remixx verifies it independently and sanitizes again before rendering each still.
+canonical proposal. Remixx verifies it independently and sanitizes again before rendering each slide.
+
+Slides may animate. Add `presentation.motionProfile` with id `editorial-reveal` and version `v1` for a
+2-3 second reveal; omit it for a still. Remixx renders the motion from a trusted composition, never from
+your fragment—CSS animations and transitions are rejected. Mark what it animates with `data-role`, whose
+only values are `claim`, `result`, and `proof`; any other `data-` attribute is rejected. A `result`
+element's text must be the recorded value and must stay constant. Revealing it is allowed; counting up to
+it is not, because every number on the way is a measurement nobody made.
 
 A hero-only post remains valid when another card would add nothing; do not pad it. Otherwise the private
 review and public feed are the hero followed by the authored slides in plan order.
